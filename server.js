@@ -299,6 +299,79 @@ app.post("/secure/logout", (req, res) => {
   res.json({ status: "ok" });
 });
 
+app.get("/api/auth/config", (req, res) => {
+  res.json({ googleClientId: GOOGLE_CLIENT_ID || "" });
+});
+
+app.post("/secure/google-login", async (req, res) => {
+  try {
+    if (!googleClient || !GOOGLE_CLIENT_ID) {
+      return res.status(400).json({ status: "error", message: "Falta GOOGLE_CLIENT_ID en el servidor." });
+    }
+
+    const credential = (req.body.credential || "").toString().trim();
+    if (!credential) {
+      return res.status(400).json({ status: "error", message: "No llegó el token de Google." });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+
+    if (!payload || !payload.email) {
+      return res.status(400).json({ status: "error", message: "Token de Google inválido." });
+    }
+
+    const email = String(payload.email).trim().toLowerCase();
+    const users = loadUsers();
+    let user = users.find(u => u.email === email);
+
+    if (!user) {
+      user = {
+        id: Date.now(),
+        email,
+        nombre: payload.name || payload.given_name || "Usuario Google",
+        password: null,
+        provider: "google",
+        avatar: payload.picture || "",
+        googleSub: payload.sub || "",
+        createdAt: new Date().toISOString(),
+      };
+      users.push(user);
+      saveUsers(users);
+    } else {
+      user.provider = "google";
+      user.avatar = payload.picture || user.avatar || "";
+      user.googleSub = payload.sub || user.googleSub || "";
+      if (!user.nombre) user.nombre = payload.name || payload.given_name || "Usuario Google";
+      saveUsers(users);
+    }
+
+    const token = signToken(user);
+    res.cookie("auth_token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.json({
+      status: "success",
+      redirect: "/productos.html",
+      user: {
+        id: user.id,
+        email: user.email,
+        nombre: user.nombre,
+        avatar: user.avatar || "",
+      },
+    });
+  } catch (err) {
+    console.error("google-login error:", err);
+    return res.status(500).json({ status: "error", message: "No se pudo iniciar sesión con Google." });
+  }
+});
+
 app.get("/api/me", (req, res) => {
   const user = getUserFromReq(req);
   if (!user) return res.json({ authed: false });
