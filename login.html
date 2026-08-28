@@ -96,7 +96,10 @@
                             </button>
                         </div>
                         <a class="logresset" href="/resetpass">¿Olvidaste tu contraseña?</a>
-                        <div id="turnstile-widget" style="display:none"></div>
+                        <div class="login-module__Si-P0q__oauthBlock">
+                            <div id="googleSignInBtn" class="login-module__Si-P0q__googleBtn"></div>
+                            <p id="googleAuthMsg" class="login-module__Si-P0q__oauthHint">Google recomendado para evitar bloqueos del flujo anterior.</p>
+                        </div>
                         <input type="hidden" id="cf-turnstile-response" value="demo-turnstile-token">
                         <div id="contener_kik_lop" style="display: none;">
                             <div class="loader">
@@ -181,19 +184,7 @@
                 </div>
             </div>
         </div>
-        <script>
-        window.javascriptCallback = function(token){
-          var input = document.getElementById('cf-turnstile-response');
-          if (input) input.value = token || 'demo-turnstile-token';
-        };
-        window.turnstile = window.turnstile || {
-          render: function(){ window.javascriptCallback('demo-turnstile-token'); return 'demo-turnstile'; },
-          reset: function(){ window.javascriptCallback('demo-turnstile-token'); },
-          remove: function(){},
-          getResponse: function(){ return 'demo-turnstile-token'; }
-        };
-        window.javascriptCallback('demo-turnstile-token');
-        </script>
-        <script src="login.main.js"></script>
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script src="auth-lite.js"></script>
     </body>
 </html>

@@ -507,6 +507,23 @@
     border: 1px solid #4ade8080
 }
 
+.login-module__Si-P0q__oauthBlock {
+    margin: 12px 0 16px;
+}
+
+.login-module__Si-P0q__googleBtn {
+    min-height: 44px;
+    display: flex;
+    justify-content: center;
+}
+
+.login-module__Si-P0q__oauthHint {
+    color: #cbd5e1;
+    text-align: center;
+    margin: 10px 0 0;
+    font-size: 12px;
+}
+
 .login-module__Si-P0q__link {
     text-align: center;
     color: #dbeafe;

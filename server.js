@@ -4,6 +4,7 @@ const fs = require("fs");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
+const { OAuth2Client } = require("google-auth-library");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +17,8 @@ const DB_PATH = path.join(__dirname, "users.json");
 
 const DEFAULT_VERIFY_CODE = "123456"; // Código fijo demo
 const pendingRegisters = new Map();
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
+const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
 
 // -------- Timeout global 25s: si cualquier ruta cuelga, responde error y no deja el navegador colgado --------
 app.use((req, res, next) => {
@@ -54,9 +57,37 @@ function saveUsers(list) {
   try {
     fs.writeFileSync(DB_PATH, JSON.stringify(list || [], null, 2), "utf-8");
   } catch (e) {
-    // Si falla la escritura (permisos/disco lleno) NO crasheamos; solo lo logueamos.
     console.warn("saveUsers falló (no se pudo escribir en disco, los usuarios no se persistirán):", e && e.message);
   }
+}
+function findUserByEmail(email) {
+  const users = loadUsers();
+  return users.find(u => u.email === email) || null;
+}
+function upsertGoogleUser(profile) {
+  const users = loadUsers();
+  const email = (profile.email || "").toLowerCase();
+  let user = users.find(u => u.email === email);
+  if (!user) {
+    user = {
+      id: Date.now(),
+      email,
+      nombre: profile.nombre || profile.given_name || "Usuario Google",
+      password: null,
+      provider: "google",
+      avatar: profile.picture || "",
+      googleSub: profile.sub || "",
+      createdAt: new Date().toISOString(),
+    };
+    users.push(user);
+  } else {
+    user.provider = "google";
+    user.avatar = profile.picture || user.avatar || "";
+    user.googleSub = profile.sub || user.googleSub || "";
+    user.nombre = user.nombre || profile.nombre || "Usuario Google";
+  }
+  saveUsers(users);
+  return user;
 }
 
 // -------- Handler global de errores Express (cualquier excepción no capturada responde 500 y NO cuelga) --------
