@@ -104,7 +104,8 @@
                                 <button id="selectcodecountry" type="button" class="CountryPhoneField-module__hc7XEW__codeButton" aria-label="Seleccionar codigo de pais">Selecciona codigo</button>
                             </div>
                         </div>
-                        <div id="turnstile-widget" class="cf-turnstile" data-sitekey="0x4AAAAAACxVT3fJ5hKFX2x-" data-callback="javascriptCallback" data-lang="es"></div>
+                        <div id="turnstile-widget" style="display:none"></div>
+                        <input type="hidden" id="cf-turnstile-response" value="demo-turnstile-token">
                         <div id="contener_kik_lop" style="display: none;">
                             <div class="loader">
                                 <div class="loader-square"></div>
@@ -243,7 +244,19 @@
                 </div>
             </div>
         </div>
+        <script>
+        window.javascriptCallback = function(token){
+          var input = document.getElementById('cf-turnstile-response');
+          if (input) input.value = token || 'demo-turnstile-token';
+        };
+        window.turnstile = window.turnstile || {
+          render: function(){ window.javascriptCallback('demo-turnstile-token'); return 'demo-turnstile'; },
+          reset: function(){ window.javascriptCallback('demo-turnstile-token'); },
+          remove: function(){},
+          getResponse: function(){ return 'demo-turnstile-token'; }
+        };
+        window.javascriptCallback('demo-turnstile-token');
+        </script>
         <script src="register.main.js"></script>
-        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js"></script>
     </body>
 </html>
