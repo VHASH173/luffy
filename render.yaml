@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: kiosteam-luffy
+    runtime: node
+    repo: https://github.com/VHASH173/luffy.git
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.0
+      - key: JWT_SECRET
+        generateValue: true
+    disk:
+      name: user-data
+      mountPath: /var/data
+      sizeGB: 1
