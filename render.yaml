@@ -11,11 +11,13 @@ services:
         value: 20.11.0
       - key: JWT_SECRET
         generateValue: true
+      # Firebase: Rellena estas 4 desde el panel Environment Variables -> Add from .env
+      # (Usa el bloque que te pasé, ya está listo para pegar)
       - key: FIREBASE_PROJECT_ID
-        value: luffy-luxe-store
+        sync: false
       - key: FIREBASE_CLIENT_EMAIL
-        value: firebase-adminsdk-fbsvc@luffy-luxe-store.iam.gserviceaccount.com
+        sync: false
       - key: FIREBASE_PRIVATE_KEY
         sync: false
       - key: FIREBASE_PRIVATE_KEY_ID
-        value: 6e3e646141e131e7f10bc04cb3bb7cb8effbbb51
+        sync: false
