@@ -474,41 +474,8 @@
         </div>
         <script src="inicio.min.js"></script>
         <script>
-        (function () {
-          function fetchSafe(url, opts = {}, timeoutMs = 3000) {
-            const ctrl = new AbortController();
-            const t = setTimeout(() => ctrl.abort(), timeoutMs);
-            return fetch(url, Object.assign({ signal: ctrl.signal }, opts)).finally(() => clearTimeout(t));
-          }
-          (async function () {
-            try {
-              const r = await fetchSafe("/api/me", { credentials: "include" }, 3000);
-              if (!r.ok) throw new Error("no-auth");
-              const data = await r.json();
-              const link = document.getElementById("accountLink");
-              const label = document.getElementById("accountLinkText");
-              if (!link || !label) return;
-              if (data.authed && data.user) {
-                label.textContent = data.user.email || (data.user.nombre || "Mi cuenta");
-                link.href = "#";
-                const handler = async (e) => {
-                  e.preventDefault();
-                  if (!confirm("¿Cerrar sesión?")) return;
-                  try {
-                    await fetchSafe("/secure/logout", { method: "POST", credentials: "include" }, 3000);
-                  } catch {}
-                  location.href = "/login";
-                };
-                link.addEventListener("click", handler);
-              } else {
-                link.href = "/login";
-              }
-            } catch (err) {
-              const link = document.getElementById("accountLink");
-              if (link) link.href = "/login";
-            }
-          })();
-        })();
+        // Nada de peticiones en el landing para evitar cuelgues por cold-start de Render free.
+        // El botón "Ingresar" tiene href="/login" por defecto en el HTML.
         </script>
     </body>
 </html>
