@@ -9,36 +9,71 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || "cambia-esto-por-un-secreto-fuerte-local";
 
-// Render + disco persistente: montamos la base de datos de usuarios donde Render tiene el disco.
-// Si no existe la carpeta (entorno local / Windows), cae a la carpeta actual (tu proyecto local).
-const RENDER_DISK_DIR = process.env.RENDER_DISK_DIR || "/var/data";
-function pickDbDir() {
-  try {
-    if (RENDER_DISK_DIR && fs.existsSync(RENDER_DISK_DIR)) return RENDER_DISK_DIR;
-  } catch {}
-  return __dirname;
-}
-const DB_PATH = path.join(pickDbDir(), "users.json");
-const DEFAULT_VERIFY_CODE = "123456"; // Código fijo demo (igual que tu convención de proyecto)
+// ========= FIX: Render Free NO TIENE disco persistente =========
+// Forzar users.json A LA CARPETA DEL PROYECTO (escritura permitida).
+// Quitamos /var/data (es read-only en free y crashea al guardar).
+const DB_PATH = path.join(__dirname, "users.json");
 
-// Store temporal de verificación (email -> { nombre, passwordHash, phone, createdAt })
-// En producción usa Redis o DB; aquí en memoria para demo simple.
+const DEFAULT_VERIFY_CODE = "123456"; // Código fijo demo
 const pendingRegisters = new Map();
 
-app.use(express.json());
+// -------- Timeout global 25s: si cualquier ruta cuelga, responde error y no deja el navegador colgado --------
+app.use((req, res, next) => {
+  const t = setTimeout(() => {
+    try {
+      if (!res.headersSent) {
+        res.status(504).json({ status: "timeout", message: "El servidor tardó demasiado. Refresca la página." });
+      }
+    } catch {}
+  }, 25000);
+  res.on("finish", () => clearTimeout(t));
+  res.on("close", () => clearTimeout(t));
+  next();
+});
+
+app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 
+// -------- loadUsers / saveUsers ROBUSTOS (NUNCA deben crashear el proceso) --------
 function loadUsers() {
   try {
     if (!fs.existsSync(DB_PATH)) return [];
-    return JSON.parse(fs.readFileSync(DB_PATH, "utf-8"));
+    try {
+      const raw = fs.readFileSync(DB_PATH, "utf-8");
+      if (!raw) return [];
+      try { return JSON.parse(raw) || []; } catch { return []; }
+    } catch (e) {
+      console.warn("loadUsers no leyó el archivo:", e && e.message);
+      return [];
+    }
   } catch {
     return [];
   }
 }
 function saveUsers(list) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(list, null, 2));
+  try {
+    fs.writeFileSync(DB_PATH, JSON.stringify(list || [], null, 2), "utf-8");
+  } catch (e) {
+    // Si falla la escritura (permisos/disco lleno) NO crasheamos; solo lo logueamos.
+    console.warn("saveUsers falló (no se pudo escribir en disco, los usuarios no se persistirán):", e && e.message);
+  }
 }
+
+// -------- Handler global de errores Express (cualquier excepción no capturada responde 500 y NO cuelga) --------
+app.use((err, req, res, next) => {
+  console.error("Express error handler:", err && err.stack || err);
+  try {
+    if (!res.headersSent) {
+      res.status(500).json({ status: "error", message: "Ocurrió un error en el servidor." });
+    }
+  } catch {}
+});
+process.on("uncaughtException", (e) => {
+  console.error("uncaughtException:", e && e.stack || e);
+});
+process.on("unhandledRejection", (e) => {
+  console.error("unhandledRejection:", e);
+});
 (function seedDefaultUser() {
   const users = loadUsers();
   if (!users.find(u => u.email === "luffy@onepiece.com")) {
