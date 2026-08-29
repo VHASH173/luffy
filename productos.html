@@ -537,17 +537,28 @@
 
         var controller = new AbortController();
         var timeoutId = setTimeout(function(){ controller.abort(); }, 8000);
+        window.__LUFFY_AUTH_DEBUG__ = { startedAt: Date.now(), page: "/productos", state: "pending" };
 
         fetch("/api/me", { credentials: "include", signal: controller.signal })
-          .then(function (r) { return r.json(); })
+          .then(function (r) {
+            window.__LUFFY_AUTH_DEBUG__.httpStatus = r.status;
+            window.__LUFFY_AUTH_DEBUG__.cookieHeader = r.headers.get("X-Luffy-Auth-Cookie") || "";
+            window.__LUFFY_AUTH_DEBUG__.authStateHeader = r.headers.get("X-Luffy-Auth-State") || "";
+            return r.json();
+          })
           .then(function (data) {
+            window.__LUFFY_AUTH_DEBUG__.payload = data;
             if (data && data.authed && data.user) {
+              window.__LUFFY_AUTH_DEBUG__.state = "authed";
               setUser(data.user);
             } else {
+              window.__LUFFY_AUTH_DEBUG__.state = "guest";
               setGuest();
             }
           })
-          .catch(function () {
+          .catch(function (err) {
+            window.__LUFFY_AUTH_DEBUG__.state = "error";
+            window.__LUFFY_AUTH_DEBUG__.error = err && err.name ? err.name : String(err || "unknown");
             setGuest();
           })
           .finally(function () {

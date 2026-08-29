@@ -356,11 +356,20 @@ app.post("/secure/google-login", async (req, res) => {
 });
 
 app.get("/api/me", (req, res) => {
+  const rawToken = req.cookies?.auth_token;
   const user = getUserFromReq(req);
-  if (!user) return res.json({ authed: false });
+  res.set("X-Luffy-Auth-Cookie", rawToken ? "present" : "missing");
+  res.set("X-Luffy-Auth-State", user ? "valid" : (rawToken ? "invalid" : "missing"));
+  if (!user) {
+    return res.json({
+      authed: false,
+      debug: { cookie: !!rawToken, state: rawToken ? "invalid" : "missing" },
+    });
+  }
   res.json({
     authed: true,
     user: { id: user.id, email: user.email, nombre: user.nombre },
+    debug: { cookie: true, state: "valid" },
   });
 });
 
