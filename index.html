@@ -230,7 +230,7 @@
                         </div>
                         <div class="productos-module__DyLbEG__commentsActions">
                             <span class="productos-module__DyLbEG__discoverCounter"></span>
-                            <button type="button" id="loginfind" class="productos-module__DyLbEG__commentCta">¡Comienza hoy mismo!</button>
+                            <a href="/login" id="loginfind" class="productos-module__DyLbEG__commentCta">¡Comienza hoy mismo!</a>
                         </div>
                     </header>
                     <div class="productos-module__DyLbEG__commentsMarquee" aria-label="Comentarios de clientes">
@@ -472,10 +472,36 @@
         <div id="imageModalupdar">
             <img src="updarted.png" draggable="false" alt="Imagen Modal" class="modal-contentc5">
         </div>
+        <!--
         <script src="inicio.min.js"></script>
+        -->
         <script>
-        // Nada de peticiones en el landing para evitar cuelgues por cold-start de Render free.
-        // El botón "Ingresar" tiene href="/login" por defecto en el HTML.
+          // Landing LIVIANA: sin scripts ofuscados, sin animaciones bloqueantes.
+          // Todo se va por rutas limpias directas: /login y /productos.
+          (function () {
+            function go(url) { location.href = url; }
+
+            function bind(id, url) {
+              var el = document.getElementById(id);
+              if (!el) return;
+              // Si ya tiene href (enlace), lo respetamos.
+              if (el.tagName === "A") return;
+              el.addEventListener("click", function () { go(url); });
+              el.style.cursor = "pointer";
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+              // Menú móvil
+              bind("onpenproductos", "/productos");
+              bind("loadignlogin", "/login");
+
+              // CTA sección comentarios (ya es <a>, pero por si algo).
+              var loginfind = document.getElementById("loginfind");
+              if (loginfind && loginfind.tagName !== "A") {
+                loginfind.addEventListener("click", function () { go("/login"); });
+              }
+            });
+          })();
         </script>
     </body>
 </html>
