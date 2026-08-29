@@ -276,17 +276,11 @@ document[cb(1651)](cb(1103), () => {
             return $ !== _
         }
     };
-    _[$(1054)](showScrollAnimation);
     let i = _[$(1384)];
     _[$(792)](mailto),
     modelive = _[$(1047)](verificarEstadoLive),
     _[$(1419)](load_componentsprincy),
-    _.Hyubz(loadmesh, i),
-    _.EMHgq(loadmeshfirn_ia, i),
-    _[$(920)](loadmeshfirn, i),
-    scroll_strmrhot(),
-    _[$(1201)](loadfliv),
-    _[$(1419)](getlapartmvi);
+    _[$(1201)](loadfliv);
     let g = _[$(920)](getParameterByName, "p");
     null != g ? _[$(302)](_[$(432)], _[$(432)]) ? _[$(1054)](i) : _[$(1476)](typeof g, _[$(593)]) && _[$(1723)](g[$(603)](), "") ? (document[$(597)]($(1137))[$(1166)](),
     _[$(920)](fetchItems, g.trim())) : _[$(920)](fetchFilter, i) : _[$(920)](fetchFilter, i)
