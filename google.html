@@ -25,13 +25,15 @@
   }
 
   /* =========== COLUMNA IZQUIERDA: LOGIN SOLO GOOGLE =========== */
+  html, body { overflow-x: hidden; }
   .left {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 28px 24px;
+    padding: clamp(18px, 4vw, 34px) clamp(14px, 3.5vw, 28px);
     background: linear-gradient(180deg, #ffffff09, #ffffff02);
     backdrop-filter: blur(2px);
+    width: 100%;
   }
   .brand {
     display: flex;
@@ -40,51 +42,58 @@
     margin-bottom: 18px;
   }
   .brand img {
-    width: 64px;
-    height: 64px;
+    width: clamp(44px, 7.2vw, 64px);
+    height: clamp(44px, 7.2vw, 64px);
     border-radius: 18px;
     object-fit: contain;
     background: #0b1020;
     border: 1px solid #ffffff1a;
   }
   .brand b {
-    font-size: 22px;
+    font-size: clamp(16px, 2.6vw, 22px);
     letter-spacing: 0.05em;
     text-transform: uppercase;
     background: linear-gradient(90deg, #ef4444, #facc15);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    white-space: nowrap;
   }
   .card {
     width: 100%;
     max-width: 460px;
-    background: linear-gradient(180deg, rgba(15,23,42,0.76), rgba(2,6,23,0.82));
-    border: 1px solid #6366f133;
+    background: linear-gradient(180deg, rgba(15,23,42,0.78), rgba(2,6,23,0.86));
+    border: 1px solid #6366f136;
     border-radius: 26px;
-    padding: 34px 30px 28px;
-    box-shadow: 0 30px 80px #02061799, inset 0 1px #ffffff0a;
+    padding: clamp(22px, 4vw, 34px) clamp(18px, 3.6vw, 30px) clamp(18px, 3.2vw, 28px);
+    box-shadow: 0 30px 80px #02061780, inset 0 1px #ffffff0a;
   }
   .title {
-    margin: 6px 0 6px;
-    font-size: 40px;
+    margin: 6px 0 8px;
+    font-size: clamp(28px, 5.4vw, 40px);
     font-weight: 900;
     color: #f8fafc;
-    line-height: 1.02;
+    line-height: 1.04;
+    overflow-wrap: anywhere;
   }
   .subtitle {
     margin: 0 0 22px;
-    font-size: 14px;
+    font-size: clamp(12.5px, 2.1vw, 14px);
     color: #cbd5e1;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
   }
   .googleBox {
     background: linear-gradient(180deg, rgba(168,85,247,0.14), rgba(56,189,248,0.08));
     border: 1px solid rgba(168,85,247,0.28);
     border-radius: 18px;
-    padding: 18px 14px 16px;
+    padding: clamp(14px, 2.6vw, 18px) clamp(12px, 2.4vw, 14px) clamp(12px, 2.2vw, 16px);
   }
   #googleSignInBtn {
     min-height: 52px;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -92,24 +101,29 @@
   #googleAuthMsg {
     margin: 10px 0 0;
     text-align: center;
-    font-size: 12px;
+    font-size: clamp(11.5px, 2vw, 12.5px);
     color: #dbeafe;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
   }
   #contener_kik_lop {
     display: none;
     text-align: center;
     color: #a7f3d0;
-    font-size: 13px;
+    font-size: clamp(12px, 2.1vw, 13px);
     margin-top: 10px;
+    overflow-wrap: anywhere;
   }
   .fine {
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: 18px;
-    font-size: 12px;
+    font-size: clamp(11.5px, 2vw, 12.5px);
     color: #94a3b8;
     gap: 6px;
+    text-align: center;
+    flex-wrap: wrap;
   }
   .fine a {
     color: #86efac;
@@ -122,11 +136,12 @@
     position: relative;
     overflow: hidden;
     display: none;
-    padding: 30px;
+    padding: clamp(18px, 2.4vw, 30px);
     background:
       radial-gradient(circle at 80% 20%, rgba(250,204,21,0.28), transparent 38%),
       radial-gradient(circle at 30% 80%, rgba(239,68,68,0.32), transparent 40%),
       linear-gradient(180deg, #0b1020 0%, #020617 100%);
+    min-height: 100vh;
   }
   .right::after {
     content: "";
@@ -138,38 +153,46 @@
   .hero {
     position: relative;
     z-index: 2;
-    height: 100%;
+    min-height: 100%;
     border-radius: 26px;
-    padding: 34px 30px;
+    padding: clamp(22px, 3vw, 34px) clamp(20px, 2.8vw, 32px);
     border: 1px solid #ffffff1a;
     background:
       radial-gradient(circle at 70% 30%, rgba(239,68,68,0.32), transparent 40%),
       radial-gradient(circle at 30% 80%, rgba(250,204,21,0.25), transparent 42%),
-      linear-gradient(180deg, #111827cc, #020617d9);
+      linear-gradient(180deg, #111827d4, #020617e0);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 22px;
   }
   .heroBadge {
     width: fit-content;
     padding: 6px 12px;
     border-radius: 999px;
-    font-size: 12px;
+    font-size: clamp(11.5px, 1.6vw, 12.5px);
     color: #fde68a;
     background: rgba(250, 204, 21, 0.12);
     border: 1px solid rgba(250, 204, 21, 0.32);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
   .hero h2 {
     margin: 18px 0 10px;
-    font-size: 52px;
-    line-height: 1;
+    font-size: clamp(30px, 5.2vw, 52px);
+    line-height: 1.02;
     font-weight: 900;
+    overflow-wrap: anywhere;
   }
   .hero p {
     margin: 0;
     max-width: 560px;
-    font-size: 16px;
+    font-size: clamp(13px, 1.9vw, 16px);
     color: #dbeafe;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
   }
   .hero .pillRow {
     display: flex;
@@ -182,8 +205,9 @@
     border-radius: 999px;
     border: 1px solid #ffffff1f;
     background: #ffffff0d;
-    font-size: 12px;
+    font-size: clamp(11.5px, 1.6vw, 12.5px);
     color: #e0f2fe;
+    white-space: nowrap;
   }
   .heroStripe {
     display: grid;
@@ -193,19 +217,21 @@
   }
   .heroStripe .box {
     border-radius: 16px;
-    padding: 14px;
+    padding: clamp(12px, 1.8vw, 14px);
     background: #ffffff0a;
     border: 1px solid #ffffff17;
+    min-width: 0;
   }
   .heroStripe .box b {
     display: block;
-    font-size: 22px;
+    font-size: clamp(18px, 2.6vw, 22px);
     color: #fde68a;
     margin-bottom: 4px;
   }
   .heroStripe .box span {
-    font-size: 12px;
+    font-size: clamp(11px, 1.5vw, 12px);
     color: #cbd5e1;
+    overflow-wrap: anywhere;
   }
   .heroFooter {
     display: flex;
@@ -213,7 +239,9 @@
     justify-content: space-between;
     margin-top: 22px;
     color: #cbd5e1;
-    font-size: 12px;
+    font-size: clamp(11px, 1.5vw, 12px);
+    gap: 12px;
+    flex-wrap: wrap;
   }
 
   @media (min-width: 900px) {
@@ -221,7 +249,7 @@
   }
   @media (max-width: 899px) {
     .app { grid-template-columns: 1fr; }
-    .title { font-size: 34px; }
+    .heroStripe { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
 </style>
 </head>
