@@ -378,7 +378,7 @@ app.get("/signup",       (req, res) => res.redirect("/google"));
 app.get("/login.html",   (req, res) => res.redirect("/google"));
 app.get("/unirme.html",  (req, res) => res.redirect("/google"));
 // Rutas internas de la app.
-app.get("/premios",      (req, res) => res.redirect("/leaderboard"));
+app.get("/premios",      (req, res) => res.redirect("/productos"));
 
 // Protegemos páginas HTML
 function protectHtml(redirectTo = "/login") {
@@ -390,8 +390,8 @@ function protectHtml(redirectTo = "/login") {
 }
 app.get("/productos.html", protectHtml("/login"));
 app.get("/productos", protectHtml("/login"));
-app.get("/leaderboard", protectHtml("/login"));
-app.get("/leaderboard.html", protectHtml("/login"));
+app.get("/leaderboard", (req, res) => res.redirect("/productos"));
+app.get("/leaderboard.html", (req, res) => res.redirect("/productos"));
 
 app.use(express.static(__dirname, {
   extensions: ["html"],
