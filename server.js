@@ -355,12 +355,20 @@ app.get("/api/me", (req, res) => {
 });
 
 // Rutas limpias (sin .html)
-app.get("/unirme", (req, res) => res.sendFile(path.join(__dirname, "unirme.html")));
-app.get("/login",  (req, res) => res.sendFile(path.join(__dirname, "login.html")));
-app.get("/ingresar", (req, res) => res.redirect("/login"));
-app.get("/register", (req, res) => res.redirect("/unirme"));
-app.get("/signup",   (req, res) => res.redirect("/unirme"));
-app.get("/premios",  (req, res) => res.redirect("/leaderboard"));
+// UNICA VENTANA DE ACCESO: Google-only (google.html).
+app.get("/google", (req, res) => res.sendFile(path.join(__dirname, "google.html")));
+// Todo flujo de acceso => /google
+app.get("/login",        (req, res) => res.redirect("/google"));
+app.get("/ingresar",     (req, res) => res.redirect("/google"));
+app.get("/login-manual", (req, res) => res.redirect("/google"));
+app.get("/unirme",       (req, res) => res.redirect("/google"));
+app.get("/register",     (req, res) => res.redirect("/google"));
+app.get("/signup",       (req, res) => res.redirect("/google"));
+// Si alguien intenta abrir los .html antiguos directamente => Google.
+app.get("/login.html",   (req, res) => res.redirect("/google"));
+app.get("/unirme.html",  (req, res) => res.redirect("/google"));
+// Rutas internas de la app.
+app.get("/premios",      (req, res) => res.redirect("/leaderboard"));
 
 // Protegemos páginas HTML
 function protectHtml(redirectTo = "/login") {
