@@ -278,15 +278,18 @@ document[cb(1651)](cb(1103), () => {
     };
     let i = _[$(1384)];
     _[$(792)](mailto),
-    modelive = _[$(1047)](verificarEstadoLive),
-    _[$(1419)](load_componentsprincy),
-    _[$(1201)](loadfliv);
+    modelive = _[$(1047)](verificarEstadoLive);
     let g = _[$(920)](getParameterByName, "p");
-    let x0 = ()=>null != g ? _[$(302)](_[$(432)], _[$(432)]) ? _[$(1054)](i) : _[$(1476)](typeof g, _[$(593)]) && _[$(1723)](g[$(603)](), "") ? (document[$(597)]($(1137))[$(1166)](),
-    _[$(920)](fetchItems, g.trim())) : _[$(920)](fetchFilter, i) : _[$(920)](fetchFilter, i);
+    let x0 = ()=>{
+        _[$(1419)](load_componentsprincy),
+        _[$(1201)](loadfliv),
+        null != g ? _[$(302)](_[$(432)], _[$(432)]) ? _[$(1054)](i) : _[$(1476)](typeof g, _[$(593)]) && _[$(1723)](g[$(603)](), "") ? (document[$(597)]($(1137))[$(1166)](),
+        _[$(920)](fetchItems, g.trim())) : _[$(920)](fetchFilter, i) : _[$(920)](fetchFilter, i)
+    }
+    ;
     window.requestAnimationFrame ? window.requestAnimationFrame(function() {
-        setTimeout(x0, 0)
-    }) : setTimeout(x0, 0)
+        setTimeout(x0, 120)
+    }) : setTimeout(x0, 120)
 }
 );
 let modelive = !1;
