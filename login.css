@@ -156,10 +156,10 @@
 }
 
 .login-module__Si-P0q__header {
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
     z-index: 40;
-    background: linear-gradient(#020617e0,#0206178f);
+    background: linear-gradient(#020617e0,#020617d9);
     border-bottom: 1px solid #94a3b824;
     justify-content: space-between;
     align-items: center;
@@ -316,15 +316,15 @@
 }
 
 .login-module__Si-P0q__card {
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
-    background: linear-gradient(#0f172ae0,#020617e6);
-    border: 1px solid #6366f14d;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    background: linear-gradient(#0f172aed,#020617f0);
+    border: 1px solid #6366f152;
     border-radius: 24px;
     width: 100%;
     max-width: 560px;
     padding: 44px 38px 30px;
-    box-shadow: 0 36px 80px #020617bd,0 0 36px #6366f124,inset 0 1px #e2e8f014
+    box-shadow: 0 28px 60px #02061799,0 0 24px #6366f11e,inset 0 1px #e2e8f014
 }
 
 .login-module__Si-P0q__title {
@@ -495,17 +495,23 @@
 }
 
 .login-module__Si-P0q__oauthBlock {
-    margin: 12px 0 16px;
+    margin: 2px 0 20px;
+    padding: 14px 12px 12px;
+    border-radius: 18px;
+    border: 1px solid #a855f733;
+    background: linear-gradient(180deg,#a855f714,#38bdf80d);
+    box-shadow: inset 0 0 0 1px #ffffff06, 0 0 24px #6366f11a;
 }
 
 .login-module__Si-P0q__googleBtn {
-    min-height: 44px;
+    min-height: 48px;
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 
 .login-module__Si-P0q__oauthHint {
-    color: #cbd5e1;
+    color: #dbeafe;
     text-align: center;
     margin: 10px 0 0;
     font-size: 12px;
@@ -1651,15 +1657,15 @@
 }
 
 .login-module__Si-P0q__card {
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
-    background: linear-gradient(#0f172ae0,#020617e6);
-    border: 1px solid #6366f14d;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    background: linear-gradient(#0f172aed,#020617f0);
+    border: 1px solid #6366f152;
     border-radius: 24px;
     width: 100%;
     max-width: 560px;
     padding: 44px 38px 30px;
-    box-shadow: 0 36px 80px #020617bd,0 0 36px #6366f124,inset 0 1px #e2e8f014
+    box-shadow: 0 28px 60px #02061799,0 0 24px #6366f11e,inset 0 1px #e2e8f014
 }
 
 .login-module__Si-P0q__title {

@@ -79,6 +79,10 @@
                     <h1 class="login-module__Si-P0q__title">✮☾༺Registrarse༻☽✮</h1>
                     <p class="login-module__Si-P0q__subtitle">Crea tu cuenta</p>
                     <form class="login-module__Si-P0q__form">
+                        <div class="login-module__Si-P0q__oauthBlock">
+                            <div id="googleSignInBtn" class="login-module__Si-P0q__googleBtn"></div>
+                            <p id="googleAuthMsg" class="login-module__Si-P0q__oauthHint">Puedes entrar directo con Google y saltarte el registro manual.</p>
+                        </div>
                         <label class="login-module__Si-P0q__fieldLabel" for="login-username">Escribe tu correo:</label>
                         <input id="emailuser" class="login-module__Si-P0q__input" placeholder="Tu correo electrónico" maxlength="100" required="" value="">
                         <label class="login-module__Si-P0q__fieldLabel" for="login-username">Escribe tu usuario:</label>
@@ -97,18 +101,14 @@
                                 </svg>
                             </button>
                         </div>
-                        <label class="login-module__Si-P0q__fieldLabel">Escribe tu telefono (primero elige codigo de pais):</label>
+                        <label class="login-module__Si-P0q__fieldLabel">Escribe tu telefono (con código de pais, sin espacios):</label>
                         <div class="CountryPhoneField-module__hc7XEW__wrapper">
                             <div class="CountryPhoneField-module__hc7XEW__topRow">
-                                <input id="phoneuser" class="CountryPhoneField-module__hc7XEW__phoneInput" placeholder="Primero elige tu codigo de pais" maxlength="25" inputmode="tel" disabled="" required="" value="">
+                                <input id="phoneuser" class="CountryPhoneField-module__hc7XEW__phoneInput" placeholder="Ej: +573001234567" maxlength="25" inputmode="tel" required="" value="">
                                 <button id="selectcodecountry" type="button" class="CountryPhoneField-module__hc7XEW__codeButton" aria-label="Seleccionar codigo de pais">Selecciona codigo</button>
                             </div>
                         </div>
-                        <div class="login-module__Si-P0q__oauthBlock">
-                            <div id="googleSignInBtn" class="login-module__Si-P0q__googleBtn"></div>
-                            <p id="googleAuthMsg" class="login-module__Si-P0q__oauthHint">Puedes entrar directo con Google y saltarte el registro manual.</p>
-                        </div>
-                        <input type="hidden" id="cf-turnstile-response" value="demo-turnstile-token">
+                        <!--<input type="hidden" id="cf-turnstile-response" value="demo-turnstile-token">-->
                         <div id="contener_kik_lop" style="display: none;">
                             <div class="loader">
                                 <div class="loader-square"></div>
@@ -116,7 +116,7 @@
                                 <div class="loader-square"></div>
                             </div>
                         </div>
-                        <button id="onreadyregister" class="login-module__Si-P0q__mainBtn">Unirme a KIOZ</button>
+                        <button id="onreadyregister" class="login-module__Si-P0q__mainBtn">Crear cuenta</button>
                     </form>
                     <p class="login-module__Si-P0q__link">
                         Ya tienes un cuenta? <a id="openregister" href="login.html" style="color:#57ff5a;text-decoration:underline;cursor:pointer;">Iniciar sesión</a>

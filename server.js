@@ -10,12 +10,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || "cambia-esto-por-un-secreto-fuerte-local";
 
-// ========= FIX: Render Free NO TIENE disco persistente =========
-// Forzar users.json A LA CARPETA DEL PROYECTO (escritura permitida).
-// Quitamos /var/data (es read-only en free y crashea al guardar).
 const DB_PATH = path.join(__dirname, "users.json");
 
-const DEFAULT_VERIFY_CODE = "123456"; // Código fijo demo
+const DEFAULT_VERIFY_CODE = "123456";
 const pendingRegisters = new Map();
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
 const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
@@ -119,6 +116,7 @@ process.on("unhandledRejection", (e) => {
   }
 })();
 
+
 function signToken(user) {
   return jwt.sign(
     { id: user.id, email: user.email, nombre: user.nombre },
@@ -191,16 +189,12 @@ app.post("/secure/login", async (req, res) => {
   }
 });
 
-// POST /secure/register — compatible con register.main.js y con formato simple
 app.post("/secure/register", async (req, res) => {
   try {
-    // Formato legacy simple (email/nombre/password) y también formato ofuscado register.main.js:
-    // nameuser, emailuser, showpassword, phoneuser, cfToken, afiliado
     const email = (req.body.emailuser || req.body.email || "").toString().trim().toLowerCase();
     const nombre = (req.body.nameuser || req.body.nombre || "Usuario").toString().trim();
     const password = (req.body.showpassword || req.body.password || "").toString();
     const phone = (req.body.phoneuser || req.body.telefono || req.body.phone || "").toString().trim();
-    const cfToken = req.body.cfToken || req.body.turnstile || "";
     const afiliado = req.body.afiliado || "";
 
     if (!email || !password) {
@@ -220,14 +214,11 @@ app.post("/secure/register", async (req, res) => {
       nombre,
       passwordHash,
       phone,
-      cfToken,
       afiliado,
       createdAt: Date.now(),
       code: DEFAULT_VERIFY_CODE,
     });
 
-    // Para que register.main.js abra el modal de verificación, devolvemos status success_mail.
-    // (En un entorno real aquí enviaríamos el código por email con SendGrid/Mailgun.)
     console.log(`[DEMO] Código de verificación para ${email} -> ${DEFAULT_VERIFY_CODE}`);
     return res.json({
       status: "success_mail",
@@ -241,8 +232,7 @@ app.post("/secure/register", async (req, res) => {
   }
 });
 
-// POST /secure/verify-code — confirma el código (modal de 6 dígitos de register.main.js)
-// Si el código es 123456 (DEFAULT_VERIFY_CODE), guarda el usuario y crea cookie de sesión.
+// POST /secure/verify-code
 app.post("/secure/verify-code", async (req, res) => {
   try {
     const email = (req.body.email || req.body.emailuser || "").toString().trim().toLowerCase();
@@ -325,29 +315,12 @@ app.post("/secure/google-login", async (req, res) => {
     }
 
     const email = String(payload.email).trim().toLowerCase();
-    const users = loadUsers();
-    let user = users.find(u => u.email === email);
-
-    if (!user) {
-      user = {
-        id: Date.now(),
-        email,
-        nombre: payload.name || payload.given_name || "Usuario Google",
-        password: null,
-        provider: "google",
-        avatar: payload.picture || "",
-        googleSub: payload.sub || "",
-        createdAt: new Date().toISOString(),
-      };
-      users.push(user);
-      saveUsers(users);
-    } else {
-      user.provider = "google";
-      user.avatar = payload.picture || user.avatar || "";
-      user.googleSub = payload.sub || user.googleSub || "";
-      if (!user.nombre) user.nombre = payload.name || payload.given_name || "Usuario Google";
-      saveUsers(users);
-    }
+    const user = upsertGoogleUser({
+      email,
+      nombre: payload.name || payload.given_name || "Usuario Google",
+      picture: payload.picture || "",
+      sub: payload.sub || "",
+    });
 
     const token = signToken(user);
     res.cookie("auth_token", token, {
@@ -382,12 +355,12 @@ app.get("/api/me", (req, res) => {
 });
 
 // Rutas limpias (sin .html)
-// Para que ?cf-turnstile-response=... también funcione (login con Turnstile)
 app.get("/unirme", (req, res) => res.sendFile(path.join(__dirname, "unirme.html")));
 app.get("/login",  (req, res) => res.sendFile(path.join(__dirname, "login.html")));
 app.get("/ingresar", (req, res) => res.redirect("/login"));
 app.get("/register", (req, res) => res.redirect("/unirme"));
 app.get("/signup",   (req, res) => res.redirect("/unirme"));
+app.get("/premios",  (req, res) => res.redirect("/leaderboard"));
 
 // Protegemos páginas HTML
 function protectHtml(redirectTo = "/login") {
@@ -407,7 +380,6 @@ app.use(express.static(__dirname, {
   index: ["index.html"],
 }));
 
-// Render corre detrás de proxy; confiable para cookies secure en producción
 app.set("trust proxy", 1);
 
 const HOST = process.env.HOST || "0.0.0.0";

@@ -79,6 +79,10 @@
                     <h1 class="login-module__Si-P0q__title">✮☾༺Iniciar sesión༻☽✮</h1>
                     <p class="login-module__Si-P0q__subtitle">Accede a tu cuenta</p>
                     <form class="login-module__Si-P0q__form">
+                        <div class="login-module__Si-P0q__oauthBlock">
+                            <div id="googleSignInBtn" class="login-module__Si-P0q__googleBtn"></div>
+                            <p id="googleAuthMsg" class="login-module__Si-P0q__oauthHint">Google recomendado para evitar bloqueos del flujo anterior.</p>
+                        </div>
                         <label class="login-module__Si-P0q__fieldLabel" for="login-username">Escribe tu correo:</label>
                         <input id="emailuser" class="login-module__Si-P0q__input" placeholder="Tu correo electrónico" maxlength="100" required="" value="">
                         <label class="login-module__Si-P0q__fieldLabel" for="login-password">Escribe tu contrasena:</label>
@@ -96,11 +100,7 @@
                             </button>
                         </div>
                         <a class="logresset" href="/resetpass">¿Olvidaste tu contraseña?</a>
-                        <div class="login-module__Si-P0q__oauthBlock">
-                            <div id="googleSignInBtn" class="login-module__Si-P0q__googleBtn"></div>
-                            <p id="googleAuthMsg" class="login-module__Si-P0q__oauthHint">Google recomendado para evitar bloqueos del flujo anterior.</p>
-                        </div>
-                        <input type="hidden" id="cf-turnstile-response" value="demo-turnstile-token">
+                        <!--<input type="hidden" id="cf-turnstile-response" value="demo-turnstile-token">-->
                         <div id="contener_kik_lop" style="display: none;">
                             <div class="loader">
                                 <div class="loader-square"></div>
