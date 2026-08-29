@@ -10,7 +10,7 @@
   const googleBtn = $("#googleSignInBtn");
   const submitBtn = $("#onreadyregister");
   const isRegisterPage = !!nameInput;
-  const REQUEST_TIMEOUT_MS = 12000;
+  const REQUEST_TIMEOUT_MS = 30000;
 
   function setBusy(state) {
     if (loader) loader.style.display = state ? "block" : "none";
@@ -104,11 +104,17 @@
   }
 
   async function handleGoogleCredential(response) {
+    const credential = response?.credential || "";
+    if (!credential) {
+      setMsg("Google no devolvió la credencial. Intenta otra vez.");
+      alert("Google no devolvió la credencial. Intenta otra vez.");
+      return;
+    }
     setBusy(true);
     setMsg("Entrando con Google...");
     try {
       const data = await postJSON("/secure/google-login", {
-        credential: response.credential,
+        credential,
       });
       if (data.status !== "success") {
         throw new Error(data.message || "No se pudo iniciar con Google");
@@ -149,6 +155,8 @@
         callback: handleGoogleCredential,
         auto_select: false,
         cancel_on_tap_outside: true,
+        context: isRegisterPage ? "signup" : "signin",
+        itp_support: true,
       });
 
       window.google.accounts.id.renderButton(googleBtn, {
@@ -156,7 +164,7 @@
         size: "large",
         text: isRegisterPage ? "signup_with" : "signin_with",
         shape: "pill",
-        width: 380,
+        width: Math.min(380, googleBtn.clientWidth || 380),
         locale: "es",
       });
 

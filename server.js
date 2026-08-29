@@ -175,6 +175,7 @@ app.post("/secure/login", async (req, res) => {
     res.cookie("auth_token", token, {
       httpOnly: true,
       sameSite: "lax",
+      secure: !!process.env.RENDER_EXTERNAL_URL,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -304,10 +305,13 @@ app.post("/secure/google-login", async (req, res) => {
       return res.status(400).json({ status: "error", message: "No llegó el token de Google." });
     }
 
-    const ticket = await googleClient.verifyIdToken({
-      idToken: credential,
-      audience: GOOGLE_CLIENT_ID,
-    });
+    const ticket = await Promise.race([
+      googleClient.verifyIdToken({
+        idToken: credential,
+        audience: GOOGLE_CLIENT_ID,
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("GOOGLE_VERIFY_TIMEOUT")), 12000)),
+    ]);
     const payload = ticket.getPayload();
 
     if (!payload || !payload.email) {
@@ -341,6 +345,12 @@ app.post("/secure/google-login", async (req, res) => {
     });
   } catch (err) {
     console.error("google-login error:", err);
+    if (err && err.message === "GOOGLE_VERIFY_TIMEOUT") {
+      return res.status(504).json({ status: "error", message: "Google tardó demasiado en validar la cuenta. Intenta otra vez." });
+    }
+    if (err && /Wrong recipient|audience|Token used too late|Malformed|Invalid token/i.test(String(err.message || err))) {
+      return res.status(400).json({ status: "error", message: "Google devolvió un token inválido para esta app." });
+    }
     return res.status(500).json({ status: "error", message: "No se pudo iniciar sesión con Google." });
   }
 });
