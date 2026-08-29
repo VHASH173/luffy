@@ -156,7 +156,8 @@
         size: "large",
         text: isRegisterPage ? "signup_with" : "signin_with",
         shape: "pill",
-        width: 320,
+        width: 380,
+        locale: "es",
       });
 
       setMsg(isRegisterPage ? "Puedes crear cuenta con Google en un clic." : "Puedes entrar con Google en un clic.");
@@ -170,6 +171,32 @@
       clearTimeout(timeoutId);
     }
   }
+
+  // === Corte "mano firme" a Google ===
+  // Desde la página de registro, el link "Iniciar sesión" debe ir a /google (no a manual).
+  // Desde el login manual, el link "Regístrate" sigue a /unirme (se mantiene plan B).
+  (function fixLinks() {
+    try {
+      var openregister = document.getElementById("openregister");
+      if (openregister && openregister.tagName === "A") {
+        if (isRegisterPage) {
+          // En registro: link "Iniciar sesión" => ventana solo Google.
+          openregister.setAttribute("href", "/google");
+          openregister.textContent = "Iniciar con Google";
+        }
+      }
+      // Si alguien abre /login-manual y NO tiene sesión, mostramos un link para ir a /google.
+      var manualHint = document.createElement("div");
+      manualHint.style.margin = "10px 0 0";
+      manualHint.style.textAlign = "center";
+      manualHint.style.fontSize = "12px";
+      manualHint.style.color = "#86efac";
+      if (!isRegisterPage && form) {
+        manualHint.innerHTML = 'Modo manual. Recomendado: <a href="/google" style="color:#86efac;text-decoration:underline;">entrar con Google</a>.';
+        form.parentNode.insertBefore(manualHint, form.nextSibling);
+      }
+    } catch (_) {}
+  })();
 
   if (form) {
     form.addEventListener("submit", isRegisterPage ? handleRegister : handleLogin);
