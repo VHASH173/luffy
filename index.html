@@ -481,25 +481,54 @@
           (function () {
             function go(url) { location.href = url; }
 
-            function bind(id, url) {
-              var el = document.getElementById(id);
-              if (!el) return;
-              // Si ya tiene href (enlace), lo respetamos.
-              if (el.tagName === "A") return;
-              el.addEventListener("click", function () { go(url); });
-              el.style.cursor = "pointer";
-            }
-
             document.addEventListener("DOMContentLoaded", function () {
-              // Menú móvil
-              bind("onpenproductos", "/productos");
-              bind("loadignlogin", "/login");
-
-              // CTA sección comentarios (ya es <a>, pero por si algo).
+              var currentAccountUrl = "/login";
+              var productosBtn = document.getElementById("onpenproductos");
+              var mobileAccountBtn = document.getElementById("loadignlogin");
+              var mobileAccountText = mobileAccountBtn ? mobileAccountBtn.querySelector(".n9k_menu_text") : null;
+              var accountLink = document.getElementById("accountLink");
+              var accountLinkText = document.getElementById("accountLinkText");
               var loginfind = document.getElementById("loginfind");
-              if (loginfind && loginfind.tagName !== "A") {
-                loginfind.addEventListener("click", function () { go("/login"); });
+
+              if (productosBtn && productosBtn.tagName !== "A") {
+                productosBtn.addEventListener("click", function () { go("/productos"); });
+                productosBtn.style.cursor = "pointer";
               }
+              if (mobileAccountBtn) {
+                mobileAccountBtn.addEventListener("click", function () { go(currentAccountUrl); });
+                mobileAccountBtn.style.cursor = "pointer";
+              }
+
+              function setGuest() {
+                currentAccountUrl = "/login";
+                if (accountLink) accountLink.setAttribute("href", "/login");
+                if (accountLinkText) accountLinkText.textContent = "Ingresar";
+                if (mobileAccountText) mobileAccountText.textContent = "Ingresar";
+                if (loginfind && loginfind.tagName === "A") {
+                  loginfind.setAttribute("href", "/login");
+                  loginfind.textContent = "¡Comienza hoy mismo!";
+                }
+              }
+
+              function setUser(user) {
+                var nombre = (user && (user.nombre || user.email)) || "Mi cuenta";
+                currentAccountUrl = "/productos";
+                if (accountLink) accountLink.setAttribute("href", "/productos");
+                if (accountLinkText) accountLinkText.textContent = nombre;
+                if (mobileAccountText) mobileAccountText.textContent = "Mi cuenta";
+                if (loginfind && loginfind.tagName === "A") {
+                  loginfind.setAttribute("href", "/productos");
+                  loginfind.textContent = "Ir al catálogo";
+                }
+              }
+
+              var controller = new AbortController();
+              var timeoutId = setTimeout(function () { controller.abort(); }, 8000);
+              fetch("/api/me", { credentials: "include", signal: controller.signal })
+                .then(function (r) { return r.json(); })
+                .then(function (data) { data && data.authed && data.user ? setUser(data.user) : setGuest(); })
+                .catch(function () { setGuest(); })
+                .finally(function () { clearTimeout(timeoutId); });
             });
           })();
         </script>

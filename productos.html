@@ -500,25 +500,37 @@
         var statusSub = document.getElementById("i9844_sur");
         var loader = document.getElementById("contener_kik_lop");
         var accountLink = openSl ? openSl.closest("a") : null;
+        var mobileAccountBtn = document.getElementById("loadignlogin");
+        var mobileAccountText = mobileAccountBtn ? mobileAccountBtn.querySelector(".n9k_menu_text") : null;
 
         function hideLoader() {
           if (loader) loader.style.display = "none";
         }
 
+        function bindMobileAccount(url) {
+          if (!mobileAccountBtn) return;
+          mobileAccountBtn.onclick = function () { location.href = url; };
+          mobileAccountBtn.style.cursor = "pointer";
+        }
+
         function setGuest() {
           if (openSl) openSl.textContent = "Ingresar";
+          if (mobileAccountText) mobileAccountText.textContent = "Ingresar";
           if (statusText) statusText.textContent = "💸 Inicia sesión para ver tu saldo.";
           if (statusSub) statusSub.textContent = "";
           if (accountLink) accountLink.setAttribute("href", "/login");
+          bindMobileAccount("/login");
           hideLoader();
         }
 
         function setUser(user) {
           var nombre = (user && (user.nombre || user.email)) || "Mi cuenta";
           if (openSl) openSl.textContent = nombre;
+          if (mobileAccountText) mobileAccountText.textContent = "Mi cuenta";
           if (statusText) statusText.textContent = "✅ Sesión activa. Ya puedes ver tu cuenta.";
           if (statusSub) statusSub.textContent = user && user.email ? user.email : "Acceso correcto";
           if (accountLink) accountLink.setAttribute("href", "/productos");
+          bindMobileAccount("/productos");
           window.__LUFFY_ME__ = user || null;
           hideLoader();
         }
@@ -544,6 +556,6 @@
           });
       });
     </script>
-    <script src="/productos.main.js?v=20260829c"></script>
+    <script src="/productos.main.js?v=20260829d"></script>
 </body>
 </html>
