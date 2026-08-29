@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Ingresar a LUFFY LUXE STORE con Google"/>
+<title>Ingresar · LUFFY LUXE STORE</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    color: #f8fafc;
+    background:
+      radial-gradient(circle at 0% 0%, rgba(239,68,68,0.30), transparent 45%),
+      radial-gradient(circle at 100% 30%, rgba(250,204,21,0.22), transparent 45%),
+      linear-gradient(180deg, #0b1020 0%, #020617 55%, #000 100%);
+  }
+
+  .app {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* =========== COLUMNA IZQUIERDA: LOGIN SOLO GOOGLE =========== */
+  .left {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 24px;
+    background: linear-gradient(180deg, #ffffff09, #ffffff02);
+    backdrop-filter: blur(2px);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .brand img {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    object-fit: contain;
+    background: #0b1020;
+    border: 1px solid #ffffff1a;
+  }
+  .brand b {
+    font-size: 22px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, #ef4444, #facc15);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .card {
+    width: 100%;
+    max-width: 460px;
+    background: linear-gradient(180deg, rgba(15,23,42,0.76), rgba(2,6,23,0.82));
+    border: 1px solid #6366f133;
+    border-radius: 26px;
+    padding: 34px 30px 28px;
+    box-shadow: 0 30px 80px #02061799, inset 0 1px #ffffff0a;
+  }
+  .title {
+    margin: 6px 0 6px;
+    font-size: 40px;
+    font-weight: 900;
+    color: #f8fafc;
+    line-height: 1.02;
+  }
+  .subtitle {
+    margin: 0 0 22px;
+    font-size: 14px;
+    color: #cbd5e1;
+  }
+  .googleBox {
+    background: linear-gradient(180deg, rgba(168,85,247,0.14), rgba(56,189,248,0.08));
+    border: 1px solid rgba(168,85,247,0.28);
+    border-radius: 18px;
+    padding: 18px 14px 16px;
+  }
+  #googleSignInBtn {
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #googleAuthMsg {
+    margin: 10px 0 0;
+    text-align: center;
+    font-size: 12px;
+    color: #dbeafe;
+  }
+  #contener_kik_lop {
+    display: none;
+    text-align: center;
+    color: #a7f3d0;
+    font-size: 13px;
+    margin-top: 10px;
+  }
+  .fine {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 18px;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+  .fine a {
+    color: #86efac;
+    text-decoration: none;
+  }
+  .fine a:hover { text-decoration: underline; }
+
+  /* =========== COLUMNA DERECHA: HERO LUFFY (TU DISEÑO, SIN FOTOS AJENAS) =========== */
+  .right {
+    position: relative;
+    overflow: hidden;
+    display: none; /* móvil */
+    padding: 30px;
+    background:
+      radial-gradient(circle at 80% 20%, rgba(250,204,21,0.28), transparent 38%),
+      radial-gradient(circle at 30% 80%, rgba(239,68,68,0.32), transparent 40%),
+      linear-gradient(180deg, #0b1020 0%, #020617 100%);
+  }
+  .right::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(135deg, #ffffff07 0 1px, transparent 1px 18px);
+    pointer-events: none;
+  }
+  .hero {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    border-radius: 26px;
+    padding: 34px 30px;
+    border: 1px solid #ffffff1a;
+    background:
+      radial-gradient(circle at 70% 30%, rgba(239,68,68,0.32), transparent 40%),
+      radial-gradient(circle at 30% 80%, rgba(250,204,21,0.25), transparent 42%),
+      linear-gradient(180deg, #111827cc, #020617d9);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .heroBadge {
+    width: fit-content;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    color: #fde68a;
+    background: rgba(250, 204, 21, 0.12);
+    border: 1px solid rgba(250, 204, 21, 0.32);
+  }
+  .hero h2 {
+    margin: 18px 0 10px;
+    font-size: 52px;
+    line-height: 1;
+    font-weight: 900;
+  }
+  .hero p {
+    margin: 0;
+    max-width: 560px;
+    font-size: 16px;
+    color: #dbeafe;
+  }
+  .hero .pillRow {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+  }
+  .hero .pill {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid #ffffff1f;
+    background: #ffffff0d;
+    font-size: 12px;
+    color: #e0f2fe;
+  }
+  .heroStripe {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 26px;
+  }
+  .heroStripe .box {
+    border-radius: 16px;
+    padding: 14px;
+    background: #ffffff0a;
+    border: 1px solid #ffffff17;
+  }
+  .heroStripe .box b {
+    display: block;
+    font-size: 22px;
+    color: #fde68a;
+    margin-bottom: 4px;
+  }
+  .heroStripe .box span {
+    font-size: 12px;
+    color: #cbd5e1;
+  }
+  .heroFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 22px;
+    color: #cbd5e1;
+    font-size: 12px;
+  }
+
+  @media (min-width: 900px) {
+    .right { display: block; }
+  }
+  @media (max-width: 899px) {
+    .app { grid-template-columns: 1fr; }
+    .title { font-size: 34px; }
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+
+    <!-- ===== VENTANA SOLO GOOGLE ===== -->
+    <div class="left">
+      <div class="card">
+        <div class="brand">
+          <img src="/logosrevis.png" alt="LUFFY LUXE STORE" onerror="this.style.display='none'"/>
+          <b>LUFFY LUXE STORE</b>
+        </div>
+        <h1 class="title">Welcome back</h1>
+        <p class="subtitle">Un clic y entras. Sin contraseñas, sin formularios que se cuelguen.</p>
+
+        <div class="googleBox">
+          <div id="googleSignInBtn"></div>
+          <p id="googleAuthMsg">Cargando Google…</p>
+          <div id="contener_kik_lop">Procesando acceso…</div>
+        </div>
+
+        <div class="fine">
+          <span>¿Prefieres manual?</span>
+          <span>
+            <a href="/login">Ingresar manual</a> · <a href="/unirme">Crear cuenta</a> · <a href="/">Inicio</a>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== HERO LATERAL (TU DISEÑO) ===== -->
+    <aside class="right">
+      <div class="hero">
+        <div>
+          <div class="heroBadge">★ STREAMING · PREMIOS · OFERTAS</div>
+          <h2>Entra como un Nakama.</h2>
+          <p>Accede rápido al catálogo, canjea puntos y entra a los sorteos mensuales. Con Google, todo en un clic.</p>
+          <div class="pillRow">
+            <div class="pill">Netflix · Prime · HBO</div>
+            <div class="pill">Spotify · Music · Tidal</div>
+            <div class="pill">Gaming · Software · IA</div>
+          </div>
+          <div class="heroStripe">
+            <div class="box"><b>+200</b><span>Productos activos</span></div>
+            <div class="box"><b>24/7</b><span>Soporte Nakama</span></div>
+            <div class="box"><b>$0</b><span>Coste registro</span></div>
+          </div>
+        </div>
+        <div class="heroFooter">
+          <span>© 2026 LUFFY LUXE STORE</span>
+          <span>One Piece vibes · No oficial</span>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="/auth-lite.js"></script>
+</body>
+</html>
