@@ -513,6 +513,25 @@
           mobileAccountBtn.style.cursor = "pointer";
         }
 
+        function readBootstrapUser() {
+          try {
+            var raw = sessionStorage.getItem("__LUFFY_LOGIN_BOOTSTRAP__");
+            if (!raw) return null;
+            var data = JSON.parse(raw);
+            if (!data || !data.user || !data.ts || (Date.now() - data.ts) > 600000) return null;
+            return data.user;
+          } catch (_) { return null; }
+        }
+
+        function setPendingSession() {
+          if (openSl) openSl.textContent = "Mi perfil";
+          if (mobileAccountText) mobileAccountText.textContent = "Mi perfil";
+          if (statusText) statusText.textContent = "⏳ Confirmando tu sesión...";
+          if (statusSub) statusSub.textContent = "Espera un momento";
+          if (accountLink) accountLink.setAttribute("href", "/perfil");
+          bindMobileAccount("/perfil");
+        }
+
         function setGuest() {
           if (openSl) openSl.textContent = "Ingresar";
           if (mobileAccountText) mobileAccountText.textContent = "Ingresar";
@@ -526,45 +545,58 @@
         function setUser(user) {
           var nombre = (user && (user.nombre || user.email)) || "Mi cuenta";
           if (openSl) openSl.textContent = nombre;
-          if (mobileAccountText) mobileAccountText.textContent = "Mi cuenta";
+          if (mobileAccountText) mobileAccountText.textContent = "Mi perfil";
           if (statusText) statusText.textContent = "✅ Sesión activa. Ya puedes ver tu cuenta.";
           if (statusSub) statusSub.textContent = user && user.email ? user.email : "Acceso correcto";
-          if (accountLink) accountLink.setAttribute("href", "/productos");
-          bindMobileAccount("/productos");
+          if (accountLink) accountLink.setAttribute("href", "/perfil");
+          bindMobileAccount("/perfil");
           window.__LUFFY_ME__ = user || null;
           hideLoader();
         }
 
-        var controller = new AbortController();
-        var timeoutId = setTimeout(function(){ controller.abort(); }, 8000);
-        window.__LUFFY_AUTH_DEBUG__ = { startedAt: Date.now(), page: "/productos", state: "pending" };
+        var bootstrapUser = readBootstrapUser();
+        window.__LUFFY_AUTH_DEBUG__ = { startedAt: Date.now(), page: "/productos", state: bootstrapUser ? "bootstrap" : "pending" };
+        if (bootstrapUser) setUser(bootstrapUser);
 
-        fetch("/api/me", { credentials: "include", signal: controller.signal })
-          .then(function (r) {
-            window.__LUFFY_AUTH_DEBUG__.httpStatus = r.status;
-            window.__LUFFY_AUTH_DEBUG__.cookieHeader = r.headers.get("X-Luffy-Auth-Cookie") || "";
-            window.__LUFFY_AUTH_DEBUG__.authStateHeader = r.headers.get("X-Luffy-Auth-State") || "";
-            return r.json();
-          })
-          .then(function (data) {
-            window.__LUFFY_AUTH_DEBUG__.payload = data;
-            if (data && data.authed && data.user) {
-              window.__LUFFY_AUTH_DEBUG__.state = "authed";
-              setUser(data.user);
-            } else {
-              window.__LUFFY_AUTH_DEBUG__.state = "guest";
-              setGuest();
-            }
-          })
-          .catch(function (err) {
-            window.__LUFFY_AUTH_DEBUG__.state = "error";
-            window.__LUFFY_AUTH_DEBUG__.error = err && err.name ? err.name : String(err || "unknown");
-            setGuest();
-          })
-          .finally(function () {
-            clearTimeout(timeoutId);
-            setTimeout(hideLoader, 1200);
-          });
+        function loadSession(attempt) {
+          var controller = new AbortController();
+          var timeoutId = setTimeout(function(){ controller.abort(); }, 20000);
+          fetch("/api/me", { credentials: "include", signal: controller.signal })
+            .then(function (r) {
+              window.__LUFFY_AUTH_DEBUG__.httpStatus = r.status;
+              window.__LUFFY_AUTH_DEBUG__.cookieHeader = r.headers.get("X-Luffy-Auth-Cookie") || "";
+              window.__LUFFY_AUTH_DEBUG__.authStateHeader = r.headers.get("X-Luffy-Auth-State") || "";
+              return r.json();
+            })
+            .then(function (data) {
+              window.__LUFFY_AUTH_DEBUG__.payload = data;
+              if (data && data.authed && data.user) {
+                window.__LUFFY_AUTH_DEBUG__.state = "authed";
+                sessionStorage.removeItem("__LUFFY_LOGIN_BOOTSTRAP__");
+                setUser(data.user);
+              } else if (attempt < 2) {
+                window.__LUFFY_AUTH_DEBUG__.state = "retrying";
+                setPendingSession();
+                setTimeout(function () { loadSession(attempt + 1); }, 1500);
+              } else {
+                window.__LUFFY_AUTH_DEBUG__.state = "guest";
+                setGuest();
+              }
+            })
+            .catch(function (err) {
+              window.__LUFFY_AUTH_DEBUG__.state = "error";
+              window.__LUFFY_AUTH_DEBUG__.error = err && err.name ? err.name : String(err || "unknown");
+              if (attempt < 2) {
+                setPendingSession();
+                setTimeout(function () { loadSession(attempt + 1); }, 1500);
+              } else if (!bootstrapUser) {
+                setGuest();
+              }
+            })
+            .finally(function () { clearTimeout(timeoutId); });
+        }
+
+        loadSession(0);
       });
     </script>
     <script src="/productos.main.js?v=20260829e"></script>

@@ -490,6 +490,16 @@
               var accountLinkText = document.getElementById("accountLinkText");
               var loginfind = document.getElementById("loginfind");
 
+              function readBootstrapUser() {
+                try {
+                  var raw = sessionStorage.getItem("__LUFFY_LOGIN_BOOTSTRAP__");
+                  if (!raw) return null;
+                  var data = JSON.parse(raw);
+                  if (!data || !data.user || !data.ts || (Date.now() - data.ts) > 600000) return null;
+                  return data.user;
+                } catch (_) { return null; }
+              }
+
               if (productosBtn && productosBtn.tagName !== "A") {
                 productosBtn.addEventListener("click", function () { go("/productos"); });
                 productosBtn.style.cursor = "pointer";
@@ -512,22 +522,31 @@
 
               function setUser(user) {
                 var nombre = (user && (user.nombre || user.email)) || "Mi cuenta";
-                currentAccountUrl = "/productos";
-                if (accountLink) accountLink.setAttribute("href", "/productos");
+                currentAccountUrl = "/perfil";
+                if (accountLink) accountLink.setAttribute("href", "/perfil");
                 if (accountLinkText) accountLinkText.textContent = nombre;
-                if (mobileAccountText) mobileAccountText.textContent = "Mi cuenta";
+                if (mobileAccountText) mobileAccountText.textContent = "Mi perfil";
                 if (loginfind && loginfind.tagName === "A") {
                   loginfind.setAttribute("href", "/productos");
                   loginfind.textContent = "Ir al catálogo";
                 }
               }
 
+              var bootstrapUser = readBootstrapUser();
+              if (bootstrapUser) setUser(bootstrapUser);
               var controller = new AbortController();
-              var timeoutId = setTimeout(function () { controller.abort(); }, 8000);
+              var timeoutId = setTimeout(function () { controller.abort(); }, 15000);
               fetch("/api/me", { credentials: "include", signal: controller.signal })
                 .then(function (r) { return r.json(); })
-                .then(function (data) { data && data.authed && data.user ? setUser(data.user) : setGuest(); })
-                .catch(function () { setGuest(); })
+                .then(function (data) {
+                  if (data && data.authed && data.user) {
+                    sessionStorage.removeItem("__LUFFY_LOGIN_BOOTSTRAP__");
+                    setUser(data.user);
+                  } else if (!bootstrapUser) {
+                    setGuest();
+                  }
+                })
+                .catch(function () { if (!bootstrapUser) setGuest(); })
                 .finally(function () { clearTimeout(timeoutId); });
             });
           })();

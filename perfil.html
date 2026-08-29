@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Perfil · LUFFY LUXE STORE</title>
+  <link rel="shortcut icon" href="/logosrevis.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", sans-serif; }
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top left, rgba(227,0,0,.20), transparent 28%),
+        radial-gradient(circle at top right, rgba(250,204,21,.10), transparent 24%),
+        linear-gradient(180deg, #090b16 0%, #05070d 100%);
+      color: #fff;
+    }
+    .perfil-card {
+      width: 100%;
+      max-width: 440px;
+      padding: 28px;
+      border-radius: 24px;
+      background: rgba(8, 12, 22, .88);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+      text-align: center;
+    }
+    .perfil-logo {
+      width: 96px;
+      height: 96px;
+      object-fit: cover;
+      border-radius: 999px;
+      border: 3px solid rgba(227,0,0,.9);
+      box-shadow: 0 0 28px rgba(227,0,0,.24);
+      margin-bottom: 14px;
+    }
+    .perfil-brand {
+      font-size: 12px;
+      letter-spacing: .20em;
+      text-transform: uppercase;
+      color: #fca5a5;
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-size: clamp(1.7rem, 5vw, 2.3rem);
+      margin-bottom: 10px;
+    }
+    .perfil-status {
+      color: #cbd5e1;
+      margin-bottom: 18px;
+    }
+    .perfil-grid {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 22px;
+      text-align: left;
+    }
+    .perfil-item {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(15,23,42,.72);
+      border: 1px solid rgba(96,165,250,.16);
+    }
+    .perfil-item span {
+      display: block;
+      font-size: 12px;
+      color: #93c5fd;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .10em;
+    }
+    .perfil-item strong {
+      display: block;
+      color: #f8fafc;
+      font-size: 15px;
+      word-break: break-word;
+    }
+    .perfil-actions {
+      display: grid;
+      gap: 10px;
+    }
+    .perfil-link, .perfil-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform .18s ease, opacity .18s ease;
+    }
+    .perfil-link {
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+    }
+    .perfil-btn {
+      color: #fff;
+      background: linear-gradient(135deg, #dc2626, #ea580c);
+    }
+    .perfil-link:hover, .perfil-btn:hover { transform: translateY(-1px); opacity: .96; }
+  </style>
+</head>
+<body>
+  <main class="perfil-card">
+    <img class="perfil-logo" src="/logosrevis.png" alt="LUFFY LUXE STORE" />
+    <p class="perfil-brand">LUFFY LUXE STORE</p>
+    <h1>Mi perfil</h1>
+    <p class="perfil-status" id="profileStatus">Cargando sesión...</p>
+
+    <section class="perfil-grid">
+      <article class="perfil-item">
+        <span>Nombre</span>
+        <strong id="profileName">-</strong>
+      </article>
+      <article class="perfil-item">
+        <span>Correo</span>
+        <strong id="profileEmail">-</strong>
+      </article>
+      <article class="perfil-item">
+        <span>Estado</span>
+        <strong id="profileState">Validando acceso</strong>
+      </article>
+    </section>
+
+    <div class="perfil-actions">
+      <a class="perfil-link" href="/productos">Ir al catálogo</a>
+      <button class="perfil-btn" id="logoutBtn" type="button">Cerrar sesión</button>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var statusEl = document.getElementById("profileStatus");
+      var nameEl = document.getElementById("profileName");
+      var emailEl = document.getElementById("profileEmail");
+      var stateEl = document.getElementById("profileState");
+      var logoutBtn = document.getElementById("logoutBtn");
+
+      function paintUser(user) {
+        var nombre = (user && (user.nombre || user.email)) || "Mi cuenta";
+        var email = (user && user.email) || "Sin correo";
+        nameEl.textContent = nombre;
+        emailEl.textContent = email;
+        stateEl.textContent = "Sesión activa";
+        statusEl.textContent = "Tu sesión está lista.";
+      }
+
+      function readBootstrapUser() {
+        try {
+          var raw = sessionStorage.getItem("__LUFFY_LOGIN_BOOTSTRAP__");
+          if (!raw) return null;
+          var data = JSON.parse(raw);
+          if (!data || !data.user || !data.ts || (Date.now() - data.ts) > 600000) return null;
+          return data.user;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      var bootstrapUser = readBootstrapUser();
+      if (bootstrapUser) paintUser(bootstrapUser);
+
+      var controller = new AbortController();
+      var timeoutId = setTimeout(function () { controller.abort(); }, 15000);
+
+      fetch("/api/me", { credentials: "include", signal: controller.signal })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data && data.authed && data.user) {
+            sessionStorage.removeItem("__LUFFY_LOGIN_BOOTSTRAP__");
+            paintUser(data.user);
+          } else {
+            location.href = "/login";
+          }
+        })
+        .catch(function () {
+          if (!bootstrapUser) {
+            statusEl.textContent = "No se pudo validar la sesión.";
+            stateEl.textContent = "Intenta otra vez";
+          }
+        })
+        .finally(function () {
+          clearTimeout(timeoutId);
+        });
+
+      logoutBtn.addEventListener("click", async function () {
+        logoutBtn.disabled = true;
+        logoutBtn.textContent = "Saliendo...";
+        try {
+          await fetch("/secure/logout", { method: "POST", credentials: "include" });
+        } catch (_) {}
+        try { sessionStorage.removeItem("__LUFFY_LOGIN_BOOTSTRAP__"); } catch (_) {}
+        location.href = "/google";
+      });
+    })();
+  </script>
+</body>
+</html>

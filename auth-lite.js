@@ -23,6 +23,17 @@
     googleMsg.style.color = ok ? "#86efac" : "#cbd5e1";
   }
 
+  function stashUser(user, redirect) {
+    try {
+      if (!user) return;
+      sessionStorage.setItem("__LUFFY_LOGIN_BOOTSTRAP__", JSON.stringify({
+        user,
+        redirect: redirect || "/perfil",
+        ts: Date.now()
+      }));
+    } catch {}
+  }
+
   async function postJSON(url, body) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -59,6 +70,7 @@
       if (data.status !== "success") {
         throw new Error(data.message || "No se pudo iniciar sesión");
       }
+      stashUser(data.user, "/perfil");
       location.href = data.redirect || "/productos";
     } catch (err) {
       alert(err.message || "No se pudo iniciar sesión");
@@ -95,6 +107,7 @@
         throw new Error(verify.message || "No se pudo verificar la cuenta");
       }
 
+      stashUser(verify.user, "/perfil");
       location.href = verify.redirect || "/productos";
     } catch (err) {
       alert(err.message || "No se pudo registrar");
@@ -119,6 +132,7 @@
       if (data.status !== "success") {
         throw new Error(data.message || "No se pudo iniciar con Google");
       }
+      stashUser(data.user, "/perfil");
       setMsg("Login con Google correcto", true);
       location.href = data.redirect || "/productos";
     } catch (err) {

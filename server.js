@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const { OAuth2Client } = require("google-auth-library");
+const admin = require("firebase-admin");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -67,14 +68,10 @@ function upsertGoogleUser(profile) {
   let user = users.find(u => u.email === email);
   if (!user) {
     user = {
-      id: Date.now(),
-      email,
+      id: Date.now(), email,
       nombre: profile.nombre || profile.given_name || "Usuario Google",
-      password: null,
-      provider: "google",
-      avatar: profile.picture || "",
-      googleSub: profile.sub || "",
-      createdAt: new Date().toISOString(),
+      password: null, provider: "google", avatar: profile.picture || "",
+      googleSub: profile.sub || "", createdAt: new Date().toISOString(),
     };
     users.push(user);
   } else {
@@ -85,6 +82,51 @@ function upsertGoogleUser(profile) {
   }
   saveUsers(users);
   return user;
+}
+
+let firestoreDb = null;
+try {
+  const projectId = process.env.FIREBASE_PROJECT_ID || "";
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || "";
+  const privateKey = (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n");
+  if (projectId && clientEmail && privateKey) {
+    if (!admin.apps.length) admin.initializeApp({ credential: admin.credential.cert({ projectId, clientEmail, privateKey }) });
+    firestoreDb = admin.firestore();
+  }
+} catch (e) {
+  console.warn("Firestore no disponible:", e && e.message);
+}
+function syncUserToFile(user) {
+  const users = loadUsers();
+  const ix = users.findIndex(u => u.email === user.email);
+  if (ix >= 0) users[ix] = { ...users[ix], ...user }; else users.push(user);
+  saveUsers(users);
+  return user;
+}
+async function findUserByEmailStore(email) {
+  const normalized = (email || "").toLowerCase();
+  if (!firestoreDb) return findUserByEmail(normalized);
+  try {
+    const snap = await firestoreDb.collection("users").where("email", "==", normalized).limit(1).get();
+    if (!snap.empty) return syncUserToFile({ ...snap.docs[0].data(), id: Number(snap.docs[0].id) || snap.docs[0].data().id || Date.now() });
+  } catch (e) { console.warn("findUserByEmailStore falló:", e && e.message); }
+  return findUserByEmail(normalized);
+}
+async function createUserStore(user) {
+  if (firestoreDb) try { await firestoreDb.collection("users").doc(String(user.id)).set(user, { merge: true }); } catch (e) { console.warn("createUserStore falló:", e && e.message); }
+  return syncUserToFile(user);
+}
+async function upsertGoogleUserStore(profile) {
+  if (!firestoreDb) return upsertGoogleUser(profile);
+  const email = (profile.email || "").toLowerCase();
+  try {
+    const snap = await firestoreDb.collection("users").where("email", "==", email).limit(1).get();
+    const base = snap.empty ? { id: Date.now(), email, createdAt: new Date().toISOString() } : { ...snap.docs[0].data(), id: Number(snap.docs[0].id) || snap.docs[0].data().id || Date.now() };
+    const user = { ...base, email, nombre: base.nombre || profile.nombre || profile.given_name || "Usuario Google", password: base.password || null, provider: "google", avatar: profile.picture || base.avatar || "", googleSub: profile.sub || base.googleSub || "" };
+    await firestoreDb.collection("users").doc(String(user.id)).set(user, { merge: true });
+    return syncUserToFile(user);
+  } catch (e) { console.warn("upsertGoogleUserStore falló:", e && e.message); }
+  return upsertGoogleUser(profile);
 }
 
 // -------- Handler global de errores Express (cualquier excepción no capturada responde 500 y NO cuelga) --------
@@ -161,8 +203,7 @@ app.post("/secure/login", async (req, res) => {
       return res.json({ status: "passwordlegn", message: "Contraseña muy corta" });
     }
 
-    const users = loadUsers();
-    const user = users.find(u => u.email === email);
+    const user = await findUserByEmailStore(email);
     if (!user) {
       return res.json({ status: "error_success_mail", message: "Usuario no existe" });
     }
@@ -205,8 +246,8 @@ app.post("/secure/register", async (req, res) => {
       return res.json({ status: "passwordlegn", message: "Tu contraseña no debe ser menor a 6 caracteres." });
     }
 
-    const users = loadUsers();
-    if (users.find(u => u.email === email)) {
+    const existingUser = await findUserByEmailStore(email);
+    if (existingUser) {
       return res.json({ status: "deniedafilied", message: "El correo ya está registrado. Intenta con otro." });
     }
 
@@ -250,8 +291,8 @@ app.post("/secure/verify-code", async (req, res) => {
       return res.json({ status: "errordenied", message: "Código incorrecto. Intenta de nuevo." });
     }
 
-    const users = loadUsers();
-    if (users.find(u => u.email === email)) {
+    const existingUser = await findUserByEmailStore(email);
+    if (existingUser) {
       pendingRegisters.delete(email);
       return res.json({ status: "deniedafilied", message: "El correo ya está registrado." });
     }
@@ -265,8 +306,7 @@ app.post("/secure/verify-code", async (req, res) => {
       password: pending.passwordHash,
       createdAt: new Date().toISOString(),
     };
-    users.push(newUser);
-    saveUsers(users);
+    await createUserStore(newUser);
     pendingRegisters.delete(email);
 
     const token = signToken(newUser);
@@ -319,7 +359,7 @@ app.post("/secure/google-login", async (req, res) => {
     }
 
     const email = String(payload.email).trim().toLowerCase();
-    const user = upsertGoogleUser({
+    const user = await upsertGoogleUserStore({
       email,
       nombre: payload.name || payload.given_name || "Usuario Google",
       picture: payload.picture || "",
@@ -399,6 +439,8 @@ function protectHtml(redirectTo = "/login") {
 }
 app.get("/productos.html", protectHtml("/login"));
 app.get("/productos", protectHtml("/login"));
+app.get("/perfil.html", protectHtml("/login"));
+app.get("/perfil", protectHtml("/login"));
 app.get("/leaderboard", (req, res) => res.redirect("/productos"));
 app.get("/leaderboard.html", (req, res) => res.redirect("/productos"));
 
