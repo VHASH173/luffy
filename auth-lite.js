@@ -10,6 +10,7 @@
   const googleBtn = $("#googleSignInBtn");
   const submitBtn = $("#onreadyregister");
   const isRegisterPage = !!nameInput;
+  const REQUEST_TIMEOUT_MS = 12000;
 
   function setBusy(state) {
     if (loader) loader.style.display = state ? "block" : "none";
@@ -23,15 +24,27 @@
   }
 
   async function postJSON(url, body) {
-    const r = await fetch(url, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(data.message || "Error de servidor");
-    return data;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const r = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.message || "Error de servidor");
+      return data;
+    } catch (err) {
+      if (err && err.name === "AbortError") {
+        throw new Error("El servidor tardó demasiado. Intenta otra vez.");
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }
 
   async function handleLogin(ev) {
@@ -111,9 +124,17 @@
   }
 
   async function initGoogle() {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     try {
-      const r = await fetch("/api/auth/config", { credentials: "include" });
-      const cfg = await r.json();
+      const r = await fetch("/api/auth/config", {
+        credentials: "include",
+        signal: controller.signal,
+      });
+      const cfg = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        throw new Error("No se pudo leer la config de Google.");
+      }
       if (!cfg.googleClientId) {
         setMsg("Falta configurar GOOGLE_CLIENT_ID en Render.");
         return;
@@ -140,7 +161,13 @@
 
       setMsg(isRegisterPage ? "Puedes crear cuenta con Google en un clic." : "Puedes entrar con Google en un clic.");
     } catch (err) {
-      setMsg("No se pudo cargar Google Sign-In.");
+      if (err && err.name === "AbortError") {
+        setMsg("Google tardó demasiado en cargar. Recarga la página.");
+      } else {
+        setMsg(err.message || "No se pudo cargar Google Sign-In.");
+      }
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 

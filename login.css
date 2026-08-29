@@ -282,24 +282,11 @@
 }
 
 .login-module__Si-P0q__particles {
-    pointer-events: none;
-    z-index: 4;
-    --px: 0px;
-    --py: 0px;
-    position: fixed;
-    inset: -20vh 0 -18vh
+    display: none;
 }
 
 .login-module__Si-P0q__logoParticle {
-    filter: blur(var(--blur,0px))drop-shadow(0 0 16px #a855f75c)drop-shadow(0 0 22px #38bdf852);
-    will-change: transform,opacity;
-    animation: login-module__Si-P0q__logoRain var(--fall-duration,16s)linear infinite;
-    animation-delay: var(--fall-delay,0s);
-    background-position: 50%;
-    background-repeat: no-repeat;
-    background-size: contain;
-    position: absolute;
-    top: 0
+    display: none;
 }
 
 @keyframes login-module__Si-P0q__logoRain {
@@ -1630,24 +1617,11 @@
 }
 
 .login-module__Si-P0q__particles {
-    pointer-events: none;
-    z-index: 4;
-    --px: 0px;
-    --py: 0px;
-    position: fixed;
-    inset: -20vh 0 -18vh
+    display: none;
 }
 
 .login-module__Si-P0q__logoParticle {
-    filter: blur(var(--blur,0px))drop-shadow(0 0 16px #a855f75c)drop-shadow(0 0 22px #38bdf852);
-    will-change: transform,opacity;
-    animation: login-module__Si-P0q__logoRain var(--fall-duration,16s)linear infinite;
-    animation-delay: var(--fall-delay,0s);
-    background-position: 50%;
-    background-repeat: no-repeat;
-    background-size: contain;
-    position: absolute;
-    top: 0
+    display: none;
 }
 
 @keyframes login-module__Si-P0q__logoRain {
