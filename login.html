@@ -79,7 +79,141 @@
                     <h1 class="login-module__Si-P0q__title">✮☾༺Iniciar sesión༻☽✮</h1>
                     <p class="login-module__Si-P0q__subtitle">Accede a tu cuenta</p>
                     <form class="login-module__Si-P0q__form">
-                        <div class="login-module__Si-P0q__oauthBlock">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Iniciar sesión con Google"/>
+<title>Ingresar · LUFFY LUXE STORE</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background:
+      radial-gradient(circle at 16% 12%, rgba(168,85,247,0.30), transparent 45%),
+      radial-gradient(circle at 86% 18%, rgba(56,189,248,0.28), transparent 45%),
+      linear-gradient(180deg, #0b1020 0%, #050816 55%, #000 100%);
+    color: #e5e7eb;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .wrap {
+    width: 100%;
+    max-width: 460px;
+    background: rgba(15, 23, 42, 0.78);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    border-radius: 22px;
+    padding: 28px 24px 22px;
+    box-shadow: 0 24px 70px rgba(2, 6, 23, 0.7);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .brand img {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    object-fit: contain;
+  }
+  .brand h1 {
+    margin: 0;
+    font-size: 22px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, #a855f7, #38bdf8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .title {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 900;
+    margin: 10px 0 6px;
+    color: #f8fafc;
+  }
+  .subtitle {
+    text-align: center;
+    color: #c7d2fe;
+    font-size: 14px;
+    margin: 0 0 18px;
+  }
+  .googleBox {
+    background: linear-gradient(180deg, rgba(168,85,247,0.12), rgba(56,189,248,0.08));
+    border: 1px solid rgba(168,85,247,0.25);
+    border-radius: 16px;
+    padding: 16px 14px 14px;
+  }
+  #googleSignInBtn {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #googleAuthMsg {
+    color: #dbeafe;
+    text-align: center;
+    font-size: 12px;
+    margin: 10px 0 0;
+  }
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 18px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .footer a {
+    color: #86efac;
+    text-decoration: none;
+    font-size: 13px;
+  }
+  .footer a:hover { text-decoration: underline; }
+  #contener_kik_lop {
+    display: none;
+    margin-top: 12px;
+    text-align: center;
+    color: #cbd5e1;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <img src="/logosrevis.png" alt="LUFFY LUXE STORE" onerror="this.style.display='none'"/>
+      <h1>LUFFY LUXE STORE</h1>
+    </div>
+    <h2 class="title">Entra con Google</h2>
+    <p class="subtitle">Un clic y listo. Sin códigos ni formularios que se cuelguen.</p>
+
+    <div class="googleBox">
+      <div id="googleSignInBtn"></div>
+      <p id="googleAuthMsg">Cargando Google…</p>
+      <div id="contener_kik_lop">Procesando…</div>
+    </div>
+
+    <div class="footer">
+      <a href="/login">Ingresar manual</a>
+      <a href="/unirme">Crear cuenta</a>
+      <a href="/">Volver al inicio</a>
+    </div>
+  </div>
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="/auth-lite.js"></script>
+</body>
+</html>                        <div class="login-module__Si-P0q__oauthBlock">
                             <div id="googleSignInBtn" class="login-module__Si-P0q__googleBtn"></div>
                             <p id="googleAuthMsg" class="login-module__Si-P0q__oauthHint">Google recomendado para evitar bloqueos del flujo anterior.</p>
                         </div>
