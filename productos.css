@@ -241,21 +241,6 @@
     inset: 0
 }
 
-
-            animation: m7k_particle_float 2s ease-out infinite;
-        }
-
-        @keyframes m7k_particle_float {
-            0% { 
-                opacity: 1; 
-                transform: translateY(0) scale(1); 
-            }
-            100% { 
-                opacity: 0; 
-                transform: translateY(-20px) scale(0); 
-            }
-        }
-
 .productos-module__DyLbEG__sideWordLeft,.productos-module__DyLbEG__sideWordRight {
     letter-spacing: .16em;
     color: #bfdbfe38;
