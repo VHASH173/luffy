@@ -2067,7 +2067,7 @@ function loadmesh($) {
             )
         } else
             xx[x4(1309)]($, x5.wBiec),
-            x5[x4(505)]("https://www.youtube.com/@LuffyLuxeStore", x5[x4(1203)])
+            console.warn("tutorial de YouTube desactivado")
     }
     )[_(1280)]($ => console[_(1555)](_(963)))[_(1932)]( () => {
         scrolunike || (scrolunike = !0,
@@ -4283,8 +4283,8 @@ function getlapartmvi() {
             return $(_)
         },
         OnEmu: "true",
-        jVNmF: "https://www.youtube.com/@LuffyLuxeStore",
-        EwvgQ: "_blank",
+        jVNmF: "",
+        EwvgQ: "_self",
         pZHWT: $(1821),
         haYbI: $(708),
         cSqKQ: function($, _, i) {
@@ -4303,14 +4303,15 @@ function getlapartmvi() {
       , g = document[$(597)](_[$(1162)])
       , xx = document[$(597)]($(367))
       , x4 = document[$(597)](_[$(1777)]);
-    _[$(528)](localStorage.getItem(i), _.OnEmu) && ($(991) !== $(433) ? g[$(1569)][$(1534)](_[$(1672)]) : (o = PiCylo[$(970)],
-    p = PiCylo[$(458)](q, r[$(412)]),
-    s = t(u[$(1295)]),
-    v = $(1577))),
-    xx[$(1651)]($(933), function() {
-        let g = $;
-        localStorage.setItem(i, _[g(537)]),
-        window[g(505)](_[g(1175)], _[g(575)])
+    localStorage.setItem(i, _.OnEmu),
+    g && (g.style[$(1768)] = _[$(1093)],
+    g[$(1616)][$(1481)] = "0",
+    g[$(1616)].transform = _[$(485)]),
+    xx && xx[$(1651)]($(933), function() {
+        localStorage.setItem(i, _.OnEmu),
+        g && (g.style[$(1768)] = _[$(1093)],
+        g[$(1616)][$(1481)] = "0",
+        g[$(1616)].transform = _[$(485)])
     }),
     x4[$(1651)](_.IcOUD, function() {
         let xx = $
