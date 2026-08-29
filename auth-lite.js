@@ -59,7 +59,7 @@
       if (data.status !== "success") {
         throw new Error(data.message || "No se pudo iniciar sesión");
       }
-      location.href = data.redirect || "/productos.html";
+      location.href = data.redirect || "/productos";
     } catch (err) {
       alert(err.message || "No se pudo iniciar sesión");
     } finally {
@@ -95,7 +95,7 @@
         throw new Error(verify.message || "No se pudo verificar la cuenta");
       }
 
-      location.href = verify.redirect || "/productos.html";
+      location.href = verify.redirect || "/productos";
     } catch (err) {
       alert(err.message || "No se pudo registrar");
     } finally {
@@ -114,7 +114,7 @@
         throw new Error(data.message || "No se pudo iniciar con Google");
       }
       setMsg("Login con Google correcto", true);
-      location.href = data.redirect || "/productos.html";
+      location.href = data.redirect || "/productos";
     } catch (err) {
       setMsg(err.message || "Falló Google Sign-In");
       alert(err.message || "Falló Google Sign-In");

@@ -285,7 +285,7 @@ app.post("/secure/verify-code", async (req, res) => {
 
     return res.json({
       status: "success",
-      redirect: "/productos.html",
+      redirect: "/productos",
       user: { id: newUser.id, email, nombre: newUser.nombre },
     });
   } catch (err) {
@@ -358,7 +358,7 @@ app.post("/secure/google-login", async (req, res) => {
 
     return res.json({
       status: "success",
-      redirect: "/productos.html",
+      redirect: "/productos",
       user: {
         id: user.id,
         email: user.email,
@@ -399,6 +399,7 @@ function protectHtml(redirectTo = "/login") {
 }
 app.get("/productos.html", protectHtml("/login"));
 app.get("/productos", protectHtml("/login"));
+app.get("/leaderboard", protectHtml("/login"));
 app.get("/leaderboard.html", protectHtml("/login"));
 
 app.use(express.static(__dirname, {
