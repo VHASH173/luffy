@@ -699,7 +699,7 @@ function load_componentsprincy() {
     }),
     document.getElementById(_[$(852)])[$(1651)](_.iggyo, () => {
         let i = $
-          , g = [_[i(1431)], i(982), _.DpgSZ, i(741), i(1748), _[i(487)], i(1947), i(586), "\xa1Hola! \ud83e\udd17 Somos KiosTeam \ud83d\ude80\n\n", _[i(1177)]]
+          , g = [_[i(1431)], i(982), _.DpgSZ, i(741), i(1748), _[i(487)], i(1947), i(586), "\xa1Hola! \ud83c\udf45 Somos LUFFY LUXE STORE \ud83d\ude80\n\n", _[i(1177)]]
           , xx = RegExp("^(" + g[i(1274)]($ => $[i(1346)](/[.*+?^${}()|[\]\\]/g, "\\$&"))[i(1700)]("|") + ")", "i");
         sms_optional = (sms_optional = (sms_optional = (sms_optional = (sms_optional = (sms_optional = (sms_optional = (sms_optional = (sms_optional = sms_optional[i(1346)](xx, "")).replace(_[i(776)], ""))[i(1346)](i(1929), nnamepd_global))[i(1346)](_[i(639)], out_emailpur))[i(1346)](_[i(1225)], out_passpur))[i(1346)](i(1733), out_perfilpur))[i(1346)](_[i(617)], out_pinpur))[i(1346)](i(1849), date_contrate_pur))[i(1346)](_[i(475)], date_caduc_pur);
         let x4 = encodeURIComponent(sms_optional);
@@ -1115,7 +1115,7 @@ function scroll_categoryes() {
         hiCzV: $(1402),
         zmWnV: $(982),
         DHrNG: $(1226),
-        hXJIJ: "\xa1Saludos \ud83c\udf8a! KiosTeam te da la bienvenida \ud83d\udc4b\n\n",
+        hXJIJ: "\xa1Saludos \ud83c\udf8a! LUFFY LUXE STORE te da la bienvenida \ud83d\udc4b\n\n",
         vwvLp: $(523),
         wFcxk: $(1929),
         yEhZN: $(746),
@@ -1315,7 +1315,7 @@ function scroll_categoryes() {
                                 TlHHH: g[$(1153)],
                                 OTabr: $(741),
                                 yubJP: g[$(330)],
-                                ObRae: "\xa1Qu\xe9 bueno verte! \ud83d\ude0a Somos KiosTeam ⚡\n\n",
+                                ObRae: "\xa1Qu\xe9 bueno verte! \ud83d\ude0a Somos LUFFY LUXE STORE ⚡\n\n",
                                 ZXutf: $(1947),
                                 tfhzw: g[$(756)],
                                 RIadE: $(1012),
@@ -2067,7 +2067,7 @@ function loadmesh($) {
             )
         } else
             xx[x4(1309)]($, x5.wBiec),
-            x5[x4(505)]("https://www.youtube.com/@Kiozteam", x5[x4(1203)])
+            x5[x4(505)]("https://www.youtube.com/@LuffyLuxeStore", x5[x4(1203)])
     }
     )[_(1280)]($ => console[_(1555)](_(963)))[_(1932)]( () => {
         scrolunike || (scrolunike = !0,
@@ -4283,7 +4283,7 @@ function getlapartmvi() {
             return $(_)
         },
         OnEmu: "true",
-        jVNmF: "https://www.youtube.com/@Kiozteam",
+        jVNmF: "https://www.youtube.com/@LuffyLuxeStore",
         EwvgQ: "_blank",
         pZHWT: $(1821),
         haYbI: $(708),

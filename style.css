@@ -458,8 +458,11 @@ body {
     content: "";
     border-radius: inherit;
     z-index: 0;
-    background-image: url("https://Kioz.b-cdn.net/cixstreaming/all/bannercixz.webp");
-    background-position: 100%;
+    background-image:
+      radial-gradient(circle at 85% 20%, rgba(250,204,21,0.28), transparent 42%),
+      radial-gradient(circle at 30% 85%, rgba(239,68,68,0.28), transparent 42%),
+      linear-gradient(135deg, rgba(15,23,42,0.88), rgba(2,6,23,0.94));
+    background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     animation: 6.4s ease-in-out infinite inicio-module__nl00za__heroBackgroundBreath;

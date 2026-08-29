@@ -1,7 +1,7 @@
 {
   "name": "luffy-luxe-store",
   "version": "1.0.0",
-  "description": "KIOSTEAM / LUFFY-LUXE-STORE con backend de login",
+  "description": "LUFFY LUXE STORE con Google Auth, Express y Render.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
