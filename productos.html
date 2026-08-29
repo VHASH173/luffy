@@ -56,15 +56,6 @@
                 <nav class="inicio-module__nl00za__quickNav">
                     <a class="inicio-module__nl00za__navLink" href="/">Inicio</a>
                     <a class="inicio-module__nl00za__navLink inicio-module__nl00za__navActive" href="/productos">Productos</a>
-                    <button class="m7k_btn_premios" id="openvipzone">
-                        <div class="m7k_btn_particles" id="m7k_btn_particles"></div>
-                        <div class="m7k_btn_icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                        </div>
-                        <span class="m7k_btn_text">Premios</span>
-                    </button>
                     <a class="inicio-module__nl00za__navLink  inicio-module__nl00za__accountLink" href="/login">
                         <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="10" cy="6" r="4" stroke="#dedede" stroke-width="1.5"></circle> <path d="M19 2C19 2 21 3.2 21 6C21 8.8 19 10 19 10" stroke="#dedede" stroke-width="1.5" stroke-linecap="round"></path> <path d="M17 4C17 4 18 4.6 18 6C18 7.4 17 8 17 8" stroke="#dedede" stroke-width="1.5" stroke-linecap="round"></path> <path d="M17.9975 18C18 17.8358 18 17.669 18 17.5C18 15.0147 14.4183 13 10 13C5.58172 13 2 15.0147 2 17.5C2 19.9853 2 22 10 22C12.231 22 13.8398 21.8433 15 21.5634" stroke="#dedede" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
                         <span id="openSl">Ingresar</span></a>
@@ -471,19 +462,6 @@
                         </svg>
                     </div>
                 </div>
-                 <div class="n9k_menu_item n9k_item_premios" id="premiosleader">
-                    <div class="n9k_menu_icon">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                        </svg>
-                    </div>
-                    <span class="n9k_menu_text">Premios</span>
-                    <div class="n9k_menu_arrow">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z"/>
-                        </svg>
-                    </div>
-                </div>
                 <div class="n9k_menu_item n9k_item_whatsapp" id="whatzsupport">
                     <div class="n9k_menu_icon">
                         <svg viewBox="0 0 24 24">
@@ -516,18 +494,56 @@
     </div>
 
     <script>
-      // === SOLO RUTAS: conectar botones Premios existentes a la pagina real (leaderboard) ===
       document.addEventListener("DOMContentLoaded", function () {
-        var openVipBtn = document.getElementById("openvipzone");
-        if (openVipBtn) {
-          openVipBtn.addEventListener("click", function () { location.href = "/leaderboard"; });
+        var openSl = document.getElementById("openSl");
+        var statusText = document.getElementById("model_buyresting");
+        var statusSub = document.getElementById("i9844_sur");
+        var loader = document.getElementById("contener_kik_lop");
+        var accountLink = openSl ? openSl.closest("a") : null;
+
+        function hideLoader() {
+          if (loader) loader.style.display = "none";
         }
-        var premiosMenu = document.getElementById("premiosleader");
-        if (premiosMenu) {
-          premiosMenu.addEventListener("click", function () { location.href = "/leaderboard"; });
+
+        function setGuest() {
+          if (openSl) openSl.textContent = "Ingresar";
+          if (statusText) statusText.textContent = "💸 Inicia sesión para ver tu saldo.";
+          if (statusSub) statusSub.textContent = "";
+          if (accountLink) accountLink.setAttribute("href", "/login");
+          hideLoader();
         }
+
+        function setUser(user) {
+          var nombre = (user && (user.nombre || user.email)) || "Mi cuenta";
+          if (openSl) openSl.textContent = nombre;
+          if (statusText) statusText.textContent = "✅ Sesión activa. Ya puedes ver tu cuenta.";
+          if (statusSub) statusSub.textContent = user && user.email ? user.email : "Acceso correcto";
+          if (accountLink) accountLink.setAttribute("href", "/productos");
+          window.__LUFFY_ME__ = user || null;
+          hideLoader();
+        }
+
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function(){ controller.abort(); }, 8000);
+
+        fetch("/api/me", { credentials: "include", signal: controller.signal })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data && data.authed && data.user) {
+              setUser(data.user);
+            } else {
+              setGuest();
+            }
+          })
+          .catch(function () {
+            setGuest();
+          })
+          .finally(function () {
+            clearTimeout(timeoutId);
+            setTimeout(hideLoader, 1200);
+          });
       });
     </script>
-    <script src="/productos.main.js?v=20260829a"></script>
+    <script src="/productos.main.js?v=20260829c"></script>
 </body>
 </html>

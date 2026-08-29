@@ -1,0 +1,12 @@
+[35mproductos.html[m[36m:[m[32m59[m[36m:[m                    <button class="m7k_btn_[1;31mpremios[m" id="openvipzone">
+[35mproductos.html[m[36m:[m[32m474[m[36m:[m                 <div class="n9k_menu_item n9k_item_[1;31mpremios[m" id="[1;31mpremios[mleader">
+[35mproductos.html[m[36m:[m[32m519[m[36m:[m      // === SOLO RUTAS: conectar botones Premios existentes a la pagina real ([1;31mleaderboard[m) ===
+[35mproductos.html[m[36m:[m[32m523[m[36m:[m          openVipBtn.addEventListener("click", function () { location.href = "/[1;31mleaderboard[m"; });
+[35mproductos.html[m[36m:[m[32m525[m[36m:[m        var [1;31mpremios[mMenu = document.getElementById("[1;31mpremios[mleader");
+[35mproductos.html[m[36m:[m[32m526[m[36m:[m        if ([1;31mpremios[mMenu) {
+[35mproductos.html[m[36m:[m[32m527[m[36m:[m          [1;31mpremios[mMenu.addEventListener("click", function () { location.href = "/[1;31mleaderboard[m"; });
+[35mserver.js[m[36m:[m[32m381[m[36m:[mapp.get("/[1;31mpremios[m",      (req, res) => res.redirect("/productos"));
+[35mserver.js[m[36m:[m[32m393[m[36m:[mapp.get("/[1;31mleaderboard[m", (req, res) => res.redirect("/productos"));
+[35mserver.js[m[36m:[m[32m394[m[36m:[mapp.get("/[1;31mleaderboard[m.html", (req, res) => res.redirect("/productos"));
+[35mstyle.css[m[36m:[m[32m1768[m[36m:[m  .n9k_menu_item.n9k_item_[1;31mpremios[m {
+[35mstyle.css[m[36m:[m[32m1772[m[36m:[m        .n9k_menu_item.n9k_item_[1;31mpremios[m:hover {
