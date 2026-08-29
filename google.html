@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Login · LUFFY LUXE STORE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}body{min-height:100vh;display:flex;justify-content:center;align-items:center;background:linear-gradient(rgba(0,0,0,.62),rgba(0,0,0,.76)),radial-gradient(circle at top left,rgba(227,0,0,.28),transparent 35%),radial-gradient(circle at top right,rgba(250,204,21,.16),transparent 30%),#060913}.login-container{width:100%;display:flex;justify-content:center;padding:20px}.login-card{background:rgba(255,255,255,.08);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.18);padding:40px;border-radius:16px;text-align:center;width:100%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,.5);color:#fff}.luffy-avatar{width:90px;height:90px;background:url('logosrevis.png') no-repeat center center/cover;border-radius:50%;margin:0 auto 20px;border:3px solid #e30000;box-shadow:0 0 15px rgba(227,0,0,.4)}.login-card h2{font-size:24px;margin-bottom:8px;text-shadow:2px 2px 4px rgba(0,0,0,.6)}.login-card p{font-size:14px;margin-bottom:18px;color:#e0e0e0}#googleSignInBtn{display:flex;justify-content:center;min-height:44px}#googleAuthMsg{font-size:13px;margin-top:12px;color:#e0e0e0}#contener_kik_lop{display:none;margin-top:10px;color:#a7f3d0}.back-link{display:inline-block;margin-top:18px;color:#fff;text-decoration:none;font-size:13px}.back-link:hover{text-decoration:underline}@media (max-width:480px){.login-card{padding:30px 20px}.login-card h2{font-size:20px}.luffy-avatar{width:75px;height:75px}}
+</style>
+</head>
+<body>
+<div class="login-container">
+<div class="login-card">
+<div class="luffy-avatar"></div>
+<h2>¡Bienvenido, Nakama!</h2>
+<p>Inicia sesión para subir al barco.</p>
+<div id="googleSignInBtn"></div>
+<p id="googleAuthMsg">Puedes entrar con Google en un clic.</p>
+<div id="contener_kik_lop">Procesando acceso…</div>
+<a class="back-link" href="/">Volver al inicio</a>
+</div>
+</div>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="/auth-lite.js"></script>
+</body>
+</html>

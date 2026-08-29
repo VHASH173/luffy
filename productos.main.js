@@ -2066,8 +2066,7 @@ function loadmesh($) {
             }
             )
         } else
-            xx[x4(1309)]($, x5.wBiec),
-            console.warn("tutorial de YouTube desactivado")
+            xx[x4(1309)]($, x5.wBiec)
     }
     )[_(1280)]($ => console[_(1555)](_(963)))[_(1932)]( () => {
         scrolunike || (scrolunike = !0,
@@ -4306,13 +4305,9 @@ function getlapartmvi() {
     localStorage.setItem(i, _.OnEmu),
     g && (g.style[$(1768)] = _[$(1093)],
     g[$(1616)][$(1481)] = "0",
-    g[$(1616)].transform = _[$(485)]),
-    xx && xx[$(1651)]($(933), function() {
-        localStorage.setItem(i, _.OnEmu),
-        g && (g.style[$(1768)] = _[$(1093)],
-        g[$(1616)][$(1481)] = "0",
-        g[$(1616)].transform = _[$(485)])
-    }),
+    g[$(1616)].transform = _[$(485)],
+    g[$(1569)].add(_[$(1672)]));
+    return;
     x4[$(1651)](_.IcOUD, function() {
         let xx = $
           , x4 = _.haYbI.split("|")
