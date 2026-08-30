@@ -233,6 +233,10 @@ function getUserFromReq(req) {
     return null;
   }
 }
+function isValidAccessKey(password) {
+  const value = String(password || "");
+  return value.length >= 9 && value.length <= 10;
+}
 function requireAuth(req, res, next) {
   const user = getUserFromReq(req);
   if (!user) return res.status(401).json({ status: "error", message: "Sesión inválida" });
@@ -263,9 +267,6 @@ app.post("/secure/login", async (req, res) => {
 
     if (!email || !password) {
       return res.json({ status: "error", message: "Faltan datos" });
-    }
-    if (password.length < 6) {
-      return res.json({ status: "passwordlegn", message: "Contraseña muy corta" });
     }
 
     const user = await findUserByEmailStore(email);
@@ -307,8 +308,8 @@ app.post("/secure/register", async (req, res) => {
     if (!email || !password) {
       return res.json({ status: "error", message: "Faltan datos" });
     }
-    if (password.length < 6) {
-      return res.json({ status: "passwordlegn", message: "Tu contraseña no debe ser menor a 6 caracteres." });
+    if (!isValidAccessKey(password)) {
+      return res.json({ status: "passwordlegn", message: "Tu llave debe tener entre 9 y 10 caracteres." });
     }
 
     const existingUser = await findUserByEmailStore(email);
@@ -468,10 +469,17 @@ app.get("/api/me", (req, res) => {
   if (!user) return res.json({ authed: false, debug: { cookie: !!rawToken, state: rawToken ? "invalid" : "missing" } });
   res.json({ authed: true, user: { id: user.id, email: user.email, nombre: user.nombre }, isAdmin: isAdminEmail(user.email), debug: { cookie: true, state: "valid" } });
 });
-app.get("/api/store/config", requireAuth, (req, res) => {
-  res.json({ status: "success", isAdmin: isAdminEmail(req.user.email), whatsappNumber: WHATSAPP_ADMIN_NUMBER, paymentMethods: PAYMENT_METHODS });
+app.get("/api/store/config", (req, res) => {
+  const user = getUserFromReq(req);
+  res.json({
+    status: "success",
+    authed: !!user,
+    isAdmin: !!user && isAdminEmail(user.email),
+    whatsappNumber: WHATSAPP_ADMIN_NUMBER,
+    paymentMethods: PAYMENT_METHODS,
+  });
 });
-app.get("/api/products", requireAuth, async (req, res) => {
+app.get("/api/products", async (req, res) => {
   if (!ensureFirestore(res)) return;
   try { res.json({ status: "success", items: await listProductsStore() }); }
   catch (err) { res.status(500).json({ status: "error", message: "No se pudieron cargar los productos." }); }
@@ -520,8 +528,8 @@ function protectHtml(redirectTo = "/login") {
     next();
   };
 }
-app.get("/productos.html", protectHtml("/login"));
-app.get("/productos", protectHtml("/login"));
+app.get("/productos.html", (req, res) => res.sendFile(path.join(__dirname, "productos.html")));
+app.get("/productos", (req, res) => res.sendFile(path.join(__dirname, "productos.html")));
 app.get("/perfil.html", protectHtml("/login"));
 app.get("/perfil", protectHtml("/login"));
 app.get("/admin.html", protectHtml("/login"));

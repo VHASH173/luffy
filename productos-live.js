@@ -40,6 +40,10 @@
     if (loader) loader.style.display = "none";
   }
 
+  function isAuthed() {
+    return !!window.__LUFFY_ME__;
+  }
+
   function setStatus(main, sub, allowHtml) {
     const statusText = $("model_buyresting");
     const statusSub = $("i9844_sur");
@@ -152,6 +156,10 @@
   }
 
   function openCheckout(item) {
+    if (!isAuthed()) {
+      setStatus("🔐 Estás viendo la tienda como invitado.", '<a href="/google" style="color:#93c5fd;text-decoration:none;font-weight:800;">Inicia sesión para comprar</a>', true);
+      return;
+    }
     state.current = item;
     ensureModal();
 
@@ -245,10 +253,10 @@
 
       const sub = configData.isAdmin
         ? '<a href="/admin" style="color:#93c5fd;text-decoration:none;font-weight:800;">Abrir panel admin</a>'
-        : "Tu cuenta está lista para comprar.";
+        : (configData.authed ? "Tu cuenta está lista para comprar." : '<a href="/google" style="color:#93c5fd;text-decoration:none;font-weight:800;">Estás como invitado, inicia sesión para comprar</a>');
 
       setStatus(
-        state.items.length ? "✅ Catálogo listo para comprar." : "📦 Aún no hay productos publicados.",
+        state.items.length ? (configData.authed ? "✅ Catálogo listo para comprar." : "👀 Catálogo visible como invitado.") : "📦 Aún no hay productos publicados.",
         sub,
         true
       );

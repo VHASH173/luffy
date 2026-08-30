@@ -91,6 +91,10 @@
       grid-template-columns: 1.05fr 0.95fr;
       gap: 18px;
     }
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -142,6 +146,31 @@
     .status {
       margin-top: 12px;
       color: #cbd5e1;
+    }
+    .preview-card {
+      display: grid;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 24px;
+      border: 1px solid rgba(96, 165, 250, 0.16);
+      background: rgba(15, 23, 42, 0.62);
+    }
+    .preview-card img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      border-radius: 18px;
+      background: #0f172a;
+    }
+    .preview-price {
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .preview-payments {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
     .list {
       display: grid;
@@ -224,7 +253,8 @@
     </section>
 
     <section class="grid">
-      <section class="card">
+      <section class="stack">
+        <section class="card">
         <h2 style="margin-bottom:14px">Nuevo producto</h2>
         <form id="productForm">
           <div class="form-grid">
@@ -266,6 +296,24 @@
           </div>
           <p class="status" id="formStatus"></p>
         </form>
+        </section>
+
+        <section class="card">
+          <h2 style="margin-bottom:14px">Vista previa</h2>
+          <article class="preview-card">
+            <img id="previewImage" src="/logosrevis.png" alt="Vista previa del producto" />
+            <div>
+              <span class="chip" id="previewCategory">General</span>
+              <h3 id="previewName" style="margin:10px 0 8px;font-size:1.25rem;">Nombre del producto</h3>
+              <p id="previewDescription" class="muted">Aquí verás la descripción del producto antes de guardarlo.</p>
+            </div>
+            <div class="preview-price" id="previewPrice">S/ 0.00</div>
+            <div class="preview-payments" id="previewPayments">
+              <span class="chip">yape</span>
+              <span class="chip">plin</span>
+            </div>
+          </article>
+        </section>
       </section>
 
       <section class="card">
@@ -309,6 +357,22 @@
         const el = $("#adminStatus");
         el.textContent = text;
         el.style.color = ok ? "#86efac" : "#fca5a5";
+      }
+
+      function syncPreview() {
+        const name = $("#name").value.trim() || "Nombre del producto";
+        const category = $("#category").value.trim() || "General";
+        const description = $("#description").value.trim() || "Aquí verás la descripción del producto antes de guardarlo.";
+        const image = $("#image").value.trim() || "/logosrevis.png";
+        const price = $("#price").value || "0";
+        const methods = checkedMethods();
+
+        $("#previewName").textContent = name;
+        $("#previewCategory").textContent = category;
+        $("#previewDescription").textContent = description;
+        $("#previewImage").src = image;
+        $("#previewPrice").textContent = currency(price);
+        $("#previewPayments").innerHTML = (methods.length ? methods : ["sin pagos"]).map((method) => `<span class="chip">${method}</span>`).join("");
       }
 
       async function loadProducts() {
@@ -388,6 +452,7 @@
           $("#active").checked = true;
           status.textContent = "Producto guardado correctamente.";
           status.style.color = "#86efac";
+          syncPreview();
           loadProducts();
         } catch (error) {
           status.textContent = error.message || "No se pudo guardar.";
@@ -395,6 +460,13 @@
         }
       });
 
+      ["#name", "#category", "#description", "#image", "#price"].forEach((selector) => {
+        const node = $(selector);
+        if (node) node.addEventListener("input", syncPreview);
+      });
+      $$(".check input[type='checkbox']").forEach((node) => node.addEventListener("change", syncPreview));
+
+      syncPreview();
       init();
     })();
   </script>
