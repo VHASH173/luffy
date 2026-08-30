@@ -11,6 +11,75 @@
     <link rel="apple-touch-icon-precomposed" href="/logosrevis.png">
     <link rel="stylesheet" href="/productos.css" />
     <link rel="stylesheet" href="/style.css" />
+    <style>
+      /* Bottom Sheet Mobile Menu */
+      .n9k_overlay_q84 {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        opacity: 0;
+        visibility: hidden;
+        z-index: 9998;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+      .n9k_overlay_q84.n9k_visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      .n9k_bottom_sheet {
+        position: fixed;
+        left: 0; right: 0; bottom: 0;
+        z-index: 9999;
+        background: #0f172a;
+        border-radius: 24px 24px 0 0;
+        box-shadow: 0 -20px 60px rgba(0,0,0,0.4);
+        transform: translateY(100%);
+        transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+        max-height: 85vh;
+        overflow-y: auto;
+        font-family: "Segoe UI", sans-serif;
+      }
+      .n9k_bottom_sheet.n9k_open {
+        transform: translateY(0);
+      }
+      .n9k_handle_bar {
+        width: 40px; height: 4px;
+        background: #334155;
+        margin: 12px auto 8px;
+        border-radius: 2px;
+        cursor: pointer;
+      }
+      .n9k_close_btn {
+        position: absolute; top: 12px; right: 16px;
+        width: 36px; height: 36px;
+        border: none; background: transparent;
+        color: #94a3b8; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .n9k_close_btn svg { width: 24px; height: 24px; }
+      .n9k_menu_title {
+        color: #fff; font-size: 1.1rem; font-weight: 800;
+        text-align: center; padding: 8px 16px 16px;
+        border-bottom: 1px solid #1e293b;
+      }
+      .n9k_menu_items { display: flex; flex-direction: column; }
+      .n9k_menu_item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 14px 16px;
+        color: #e2e8f0; text-decoration: none;
+        border-bottom: 1px solid #1e293b;
+        transition: background 0.15s;
+      }
+      .n9k_menu_item:active { background: #1e293b; }
+      .n9k_menu_icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: #1e293b; border-radius: 12px; flex-shrink: 0; }
+      .n9k_menu_icon svg { width: 22px; height: 22px; stroke: #57ff5a; }
+      .n9k_menu_text { flex: 1; font-weight: 600; font-size: 1rem; }
+      .n9k_menu_arrow svg { width: 20px; height: 20px; stroke: #64748b; }
+      @media (min-width: 769px) {
+        .n9k_overlay_q84, .n9k_bottom_sheet { display: none !important; }
+        #btnmenudash { display: none !important; }
+      }
+    </style>
 </head>
 <body>
 
@@ -434,9 +503,33 @@
                         <svg viewBox="0 0 24 24">
                             <path d="M8 5v14l11-7z"/>
                         </svg>
-                    </div>
-                </div>
-            </div>
+</div>
+    </div>
+    </div>
+  </div>
+
+    <!-- Menú móvil simplificado: solo Inicio, Productos, Ingresar -->
+    <div class="n9k_overlay_q84" id="n9k_overlay_q84"></div>
+    <div class="n9k_bottom_sheet" id="n9k_bottom_sheet">
+      <div class="n9k_handle_bar" id="closemenudash"></div>
+      <button class="n9k_close_btn" id="closemenudash01">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+      <h3 class="n9k_menu_title">Menú Principal</h3>
+      <div class="n9k_menu_items">
+        <a class="n9k_menu_item n9k_item_inicio" href="/">
+          <div class="n9k_menu_icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+          <span class="n9k_menu_text">Inicio</span>
+        </a>
+        <a class="n9k_menu_item n9k_item_productos" href="/productos">
+          <div class="n9k_menu_icon"><svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg></div>
+          <span class="n9k_menu_text">Productos</span>
+        </a>
+        <a class="n9k_menu_item n9k_item_ingresar" id="loadignlogin" href="/login">
+          <div class="n9k_menu_icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+          <span class="n9k_menu_text">Ingresar</span>
+        </a>
+      </div>
     </div>
 
     <div id="modalOverlayEl" class="vip-modal-overlay">
@@ -455,6 +548,33 @@
     </div>
 
     <script>
+      // ====== MENÚ MÓVIL (Bottom Sheet) ======
+      (function initMobileMenu() {
+        var btnOpen = document.getElementById("btnmenudash");
+        var sheet = document.getElementById("n9k_bottom_sheet");
+        var overlay = document.getElementById("n9k_overlay_q84");
+        var btnCloseHandle = document.getElementById("closemenudash");
+        var btnCloseBtn = document.getElementById("closemenudash01");
+        if (!btnOpen || !sheet || !overlay) return;
+        function openMenu() {
+          sheet.classList.add("n9k_open");
+          overlay.classList.add("n9k_visible");
+          document.body.style.overflow = "hidden";
+        }
+        function closeMenu() {
+          sheet.classList.remove("n9k_open");
+          overlay.classList.remove("n9k_visible");
+          document.body.style.overflow = "";
+        }
+        btnOpen.addEventListener("click", openMenu);
+        btnCloseHandle.addEventListener("click", closeMenu);
+        btnCloseBtn.addEventListener("click", closeMenu);
+        overlay.addEventListener("click", closeMenu);
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && sheet.classList.contains("n9k_open")) closeMenu();
+        });
+      })();
+
       document.addEventListener("DOMContentLoaded", function () {
         var openSl = document.getElementById("openSl");
         var statusText = document.getElementById("model_buyresting");
