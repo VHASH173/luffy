@@ -252,77 +252,98 @@
       <p class="muted" id="adminStatus">Validando acceso...</p>
     </section>
 
-    <section class="grid">
-      <section class="stack">
-        <section class="card">
-        <h2 style="margin-bottom:14px">Nuevo producto</h2>
-        <form id="productForm">
-          <div class="form-grid">
-            <div class="field">
-              <label for="name">Nombre</label>
-              <input id="name" required />
-            </div>
-            <div class="field">
-              <label for="category">Categoría</label>
-              <input id="category" placeholder="Streaming, Gaming, etc." />
-            </div>
-            <div class="field">
-              <label for="price">Precio</label>
-              <input id="price" type="number" min="0" step="0.01" required />
-            </div>
-            <div class="field">
-              <label for="image">Foto URL</label>
-              <input id="image" type="url" placeholder="https://..." required />
-            </div>
-            <div class="field full">
-              <label for="description">Descripción</label>
-              <textarea id="description" required></textarea>
-            </div>
-            <div class="field full">
-              <label>Métodos de pago</label>
-              <div class="checks">
-                <label class="check"><input type="checkbox" value="yape" checked /> Yape</label>
-                <label class="check"><input type="checkbox" value="plin" checked /> Plin</label>
-                <label class="check"><input type="checkbox" value="transferencia" /> Transferencia</label>
+    <section class="card" id="loginCard" style="display:none; max-width:500px; margin: 40px auto;">
+      <h2 style="margin-bottom:14px; text-align:center;">Acceso Restringido</h2>
+      <p class="muted" style="text-align:center; margin-bottom:20px;">Ingresa tus credenciales de administrador para continuar.</p>
+      <form id="adminLoginForm">
+        <div class="stack">
+          <div class="field">
+            <label>Correo Electrónico</label>
+            <input type="email" id="adminEmail" placeholder="admin@ejemplo.com" required />
+          </div>
+          <div class="field">
+            <label>Contraseña</label>
+            <input type="password" id="adminPass" placeholder="••••••••" required />
+          </div>
+          <button class="btn" type="submit" style="width:100%; margin-top:10px;">Entrar al Panel</button>
+          <p id="loginError" style="color:#fca5a5; font-size:0.9rem; text-align:center; margin-top:10px;"></p>
+        </div>
+      </form>
+    </section>
+
+    <div id="adminContent" style="display:none;">
+      <section class="grid">
+        <section class="stack">
+          <section class="card">
+          <h2 style="margin-bottom:14px">Nuevo producto</h2>
+          <form id="productForm">
+            <div class="form-grid">
+              <div class="field">
+                <label for="name">Nombre</label>
+                <input id="name" required />
+              </div>
+              <div class="field">
+                <label for="category">Categoría</label>
+                <input id="category" placeholder="Streaming, Gaming, etc." />
+              </div>
+              <div class="field">
+                <label for="price">Precio</label>
+                <input id="price" type="number" min="0" step="0.01" required />
+              </div>
+              <div class="field">
+                <label for="image">Foto URL</label>
+                <input id="image" type="url" placeholder="https://..." required />
+              </div>
+              <div class="field full">
+                <label for="description">Descripción</label>
+                <textarea id="description" required></textarea>
+              </div>
+              <div class="field full">
+                <label>Métodos de pago</label>
+                <div class="checks">
+                  <label class="check"><input type="checkbox" value="yape" checked /> Yape</label>
+                  <label class="check"><input type="checkbox" value="plin" checked /> Plin</label>
+                  <label class="check"><input type="checkbox" value="transferencia" /> Transferencia</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label class="check"><input id="active" type="checkbox" checked /> Producto activo</label>
               </div>
             </div>
-            <div class="field full">
-              <label class="check"><input id="active" type="checkbox" checked /> Producto activo</label>
+            <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn" type="submit">Guardar producto</button>
+              <button class="btn sec" type="reset">Limpiar</button>
             </div>
-          </div>
-          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-            <button class="btn" type="submit">Guardar producto</button>
-            <button class="btn sec" type="reset">Limpiar</button>
-          </div>
-          <p class="status" id="formStatus"></p>
-        </form>
+            <p class="status" id="formStatus"></p>
+          </form>
+          </section>
+
+          <section class="card">
+            <h2 style="margin-bottom:14px">Vista previa</h2>
+            <article class="preview-card">
+              <img id="previewImage" src="/logosrevis.png" alt="Vista previa del producto" />
+              <div>
+                <span class="chip" id="previewCategory">General</span>
+                <h3 id="previewName" style="margin:10px 0 8px;font-size:1.25rem;">Nombre del producto</h3>
+                <p id="previewDescription" class="muted">Aquí verás la descripción del producto antes de guardarlo.</p>
+              </div>
+              <div class="preview-price" id="previewPrice">S/ 0.00</div>
+              <div class="preview-payments" id="previewPayments">
+                <span class="chip">yape</span>
+                <span class="chip">plin</span>
+              </div>
+            </article>
+          </section>
         </section>
 
         <section class="card">
-          <h2 style="margin-bottom:14px">Vista previa</h2>
-          <article class="preview-card">
-            <img id="previewImage" src="/logosrevis.png" alt="Vista previa del producto" />
-            <div>
-              <span class="chip" id="previewCategory">General</span>
-              <h3 id="previewName" style="margin:10px 0 8px;font-size:1.25rem;">Nombre del producto</h3>
-              <p id="previewDescription" class="muted">Aquí verás la descripción del producto antes de guardarlo.</p>
-            </div>
-            <div class="preview-price" id="previewPrice">S/ 0.00</div>
-            <div class="preview-payments" id="previewPayments">
-              <span class="chip">yape</span>
-              <span class="chip">plin</span>
-            </div>
-          </article>
+          <h2 style="margin-bottom:14px">Productos guardados</h2>
+          <div id="productList" class="list">
+            <div class="empty">Cargando productos...</div>
+          </div>
         </section>
       </section>
-
-      <section class="card">
-        <h2 style="margin-bottom:14px">Productos guardados</h2>
-        <div id="productList" class="list">
-          <div class="empty">Cargando productos...</div>
-        </div>
-      </section>
-    </section>
+    </div>
   </main>
 
   <script>
@@ -418,18 +439,43 @@
         try {
           const cfg = await fetchJSON("/api/store/config");
           if (!cfg.isAdmin) {
-            setAdminStatus("No tienes permisos de admin para entrar a este panel.", false);
-            $("#productForm").style.display = "none";
-            $("#productList").innerHTML = '<div class="empty">Acceso denegado.</div>';
+            setAdminStatus("Inicia sesión para gestionar la tienda.", false);
+            $("#loginCard").style.display = "block";
+            $("#adminContent").style.display = "none";
             return;
           }
           setAdminStatus("Admin activo. Aquí puedes subir y borrar productos.", true);
+          $("#loginCard").style.display = "none";
+          $("#adminContent").style.display = "block";
           loadProducts();
         } catch (error) {
-          setAdminStatus(error.message || "No se pudo validar tu acceso.", false);
-          $("#productForm").style.display = "none";
+          setAdminStatus("Sesión requerida.", false);
+          $("#loginCard").style.display = "block";
+          $("#adminContent").style.display = "none";
         }
       }
+
+      $("#adminLoginForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const err = $("#loginError");
+        err.textContent = "Validando...";
+        try {
+          const data = await fetchJSON("/secure/login", {
+            method: "POST",
+            body: JSON.stringify({
+              emailuser: $("#adminEmail").value.trim(),
+              showpassword: $("#adminPass").value,
+            }),
+          });
+          if (data.status === "success") {
+            location.reload();
+          } else {
+            err.textContent = data.message || "Credenciales incorrectas";
+          }
+        } catch (error) {
+          err.textContent = error.message || "Error al conectar con el servidor";
+        }
+      });
 
       $("#productForm").addEventListener("submit", async function (event) {
         event.preventDefault();

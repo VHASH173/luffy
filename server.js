@@ -532,8 +532,8 @@ app.get("/productos.html", (req, res) => res.sendFile(path.join(__dirname, "prod
 app.get("/productos", (req, res) => res.sendFile(path.join(__dirname, "productos.html")));
 app.get("/perfil.html", protectHtml("/login"));
 app.get("/perfil", protectHtml("/login"));
-app.get("/admin.html", protectHtml("/login"));
-app.get("/admin", protectHtml("/login"));
+app.get("/admin.html", (req, res) => res.sendFile(path.join(__dirname, "admin.html")));
+app.get("/admin", (req, res) => res.sendFile(path.join(__dirname, "admin.html")));
 app.get("/leaderboard", (req, res) => res.redirect("/productos"));
 app.get("/leaderboard.html", (req, res) => res.redirect("/productos"));
 
