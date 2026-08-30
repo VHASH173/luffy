@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const { OAuth2Client } = require("google-auth-library");
 const admin = require("firebase-admin");
+const multer = require("multer");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -484,6 +485,41 @@ app.get("/api/products", async (req, res) => {
   try { res.json({ status: "success", items: await listProductsStore() }); }
   catch (err) { res.status(500).json({ status: "error", message: "No se pudieron cargar los productos." }); }
 });
+const multer = require("multer");
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) cb(null, true);
+    else cb(new Error("Solo se permiten imágenes"));
+  }
+});
+
+// ... existing code ...
+
+app.post("/api/admin/upload-image", requireAdmin, upload.single("image"), async (req, res) => {
+  if (!ensureFirestore(res)) return;
+  if (!req.file) return res.status(400).json({ status: "error", message: "No se recibió archivo" });
+  
+  try {
+    const bucket = admin.storage().bucket();
+    const fileName = `products/${Date.now()}-${req.file.originalname.replace(/\s+/g, "_")}`;
+    const file = bucket.file(fileName);
+    
+    await file.save(req.file.buffer, {
+      metadata: { contentType: req.file.mimetype },
+      public: true,
+      validation: "md5"
+    });
+    
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+    res.json({ status: "success", url: publicUrl });
+  } catch (err) {
+    console.error("Upload error:", err);
+    res.status(500).json({ status: "error", message: "Error al subir imagen" });
+  }
+});
+
 app.post("/api/admin/products", requireAdmin, async (req, res) => {
   if (!ensureFirestore(res)) return;
   try { res.json({ status: "success", item: await saveProductStore(req.body || {}, req.user) }); }
