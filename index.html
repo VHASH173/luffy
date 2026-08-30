@@ -10,6 +10,75 @@
         <link rel="shortcut icon" href="logosrevis.png">
         <link rel="apple-touch-icon-precomposed" href="logosrevis.png">
         <link rel="stylesheet" href="style.css"/>
+    <style>
+      /* Bottom Sheet Mobile Menu */
+      .n9k_overlay_q84 {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        opacity: 0;
+        visibility: hidden;
+        z-index: 9998;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+      .n9k_overlay_q84.n9k_visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      .n9k_bottom_sheet {
+        position: fixed;
+        left: 0; right: 0; bottom: 0;
+        z-index: 9999;
+        background: #0f172a;
+        border-radius: 24px 24px 0 0;
+        box-shadow: 0 -20px 60px rgba(0,0,0,0.4);
+        transform: translateY(100%);
+        transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+        max-height: 85vh;
+        overflow-y: auto;
+        font-family: "Segoe UI", sans-serif;
+      }
+      .n9k_bottom_sheet.n9k_open {
+        transform: translateY(0);
+      }
+      .n9k_handle_bar {
+        width: 40px; height: 4px;
+        background: #334155;
+        margin: 12px auto 8px;
+        border-radius: 2px;
+        cursor: pointer;
+      }
+      .n9k_close_btn {
+        position: absolute; top: 12px; right: 16px;
+        width: 36px; height: 36px;
+        border: none; background: transparent;
+        color: #94a3b8; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .n9k_close_btn svg { width: 24px; height: 24px; }
+      .n9k_menu_title {
+        color: #fff; font-size: 1.1rem; font-weight: 800;
+        text-align: center; padding: 8px 16px 16px;
+        border-bottom: 1px solid #1e293b;
+      }
+      .n9k_menu_items { display: flex; flex-direction: column; }
+      .n9k_menu_item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 14px 16px;
+        color: #e2e8f0; text-decoration: none;
+        border-bottom: 1px solid #1e293b;
+        transition: background 0.15s;
+      }
+      .n9k_menu_item:active { background: #1e293b; }
+      .n9k_menu_icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: #1e293b; border-radius: 12px; flex-shrink: 0; }
+      .n9k_menu_icon svg { width: 22px; height: 22px; stroke: #57ff5a; }
+      .n9k_menu_text { flex: 1; font-weight: 600; font-size: 1rem; }
+      .n9k_menu_arrow svg { width: 20px; height: 20px; stroke: #64748b; }
+      @media (min-width: 769px) {
+        .n9k_overlay_q84, .n9k_bottom_sheet { display: none !important; }
+        #btnmenudash { display: none !important; }
+      }
+    </style>
     </head>
     <body>
         <main class="inicio-module__nl00za__page">
@@ -479,6 +548,42 @@
           // Landing LIVIANA: sin scripts ofuscados, sin animaciones bloqueantes.
           // Todo se va por rutas limpias directas: /login y /productos.
           (function () {
+            function go(url) { location.href = url; }
+
+            // ====== MENÚ MÓVIL (Bottom Sheet) ======
+            (function initMobileMenu() {
+              var btnOpen = document.getElementById("btnmenudash");
+              var sheet = document.getElementById("n9k_bottom_sheet");
+              var overlay = document.getElementById("n9k_overlay_q84");
+              var btnCloseHandle = document.getElementById("closemenudash");
+              var btnCloseBtn = document.getElementById("closemenudash01");
+
+              if (!btnOpen || !sheet || !overlay) return;
+
+              function openMenu() {
+                sheet.classList.add("n9k_open");
+                overlay.classList.add("n9k_visible");
+                document.body.style.overflow = "hidden";
+              }
+
+              function closeMenu() {
+                sheet.classList.remove("n9k_open");
+                overlay.classList.remove("n9k_visible");
+                document.body.style.overflow = "";
+              }
+
+              btnOpen.addEventListener("click", openMenu);
+              btnCloseHandle.addEventListener("click", closeMenu);
+              btnCloseBtn.addEventListener("click", closeMenu);
+              overlay.addEventListener("click", closeMenu);
+
+              // Cerrar con Escape
+              document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape" && sheet.classList.contains("n9k_open")) closeMenu();
+              });
+            })();
+
+            // ====== CUENTA / NAVEGACIÓN ======
             function go(url) { location.href = url; }
 
             document.addEventListener("DOMContentLoaded", function () {
