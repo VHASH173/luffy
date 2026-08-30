@@ -9,66 +9,168 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", sans-serif; }
     body {
       min-height: 100vh;
-      display: grid;
-      place-items: center;
       padding: 24px;
       background:
-        radial-gradient(circle at top left, rgba(227,0,0,.20), transparent 28%),
-        radial-gradient(circle at top right, rgba(250,204,21,.10), transparent 24%),
+        radial-gradient(circle at top left, rgba(227,0,0,.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(59,130,246,.14), transparent 24%),
         linear-gradient(180deg, #090b16 0%, #05070d 100%);
       color: #fff;
     }
-    .perfil-card {
-      width: 100%;
-      max-width: 440px;
-      padding: 28px;
-      border-radius: 24px;
-      background: rgba(8, 12, 22, .88);
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 20px 60px rgba(0,0,0,.45);
-      text-align: center;
+    .perfil-shell {
+      width: min(100%, 980px);
+      margin: 0 auto;
+      display: grid;
+      gap: 22px;
+    }
+    .perfil-topbar,
+    .perfil-card,
+    .perfil-panel {
+      border-radius: 30px;
+      border: 1px solid rgba(148,163,184,.16);
+      background: linear-gradient(180deg, rgba(8,12,22,.90), rgba(5,10,18,.84));
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+      backdrop-filter: blur(16px);
+    }
+    .perfil-topbar {
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .perfil-brandbox {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
     }
     .perfil-logo {
-      width: 96px;
-      height: 96px;
+      width: 76px;
+      height: 76px;
       object-fit: cover;
       border-radius: 999px;
-      border: 3px solid rgba(227,0,0,.9);
-      box-shadow: 0 0 28px rgba(227,0,0,.24);
-      margin-bottom: 14px;
+      border: 3px solid rgba(227,0,0,.88);
+      box-shadow: 0 0 24px rgba(227,0,0,.25);
+      flex: 0 0 auto;
     }
-    .perfil-brand {
-      font-size: 12px;
-      letter-spacing: .20em;
-      text-transform: uppercase;
-      color: #fca5a5;
-      margin-bottom: 10px;
+    .perfil-brandtext {
+      min-width: 0;
     }
-    h1 {
-      font-size: clamp(1.7rem, 5vw, 2.3rem);
-      margin-bottom: 10px;
+    .perfil-brandimg {
+      display: block;
+      max-width: min(100%, 280px);
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 16px rgba(99,102,241,.25));
+    }
+    .perfil-brandline {
+      margin-top: 6px;
+      color: #cbd5e1;
+      font-size: .95rem;
+      letter-spacing: .03em;
+    }
+    .perfil-nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .perfil-nav a {
+      text-decoration: none;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(96,165,250,.28);
+      background: rgba(15,23,42,.72);
+      font-weight: 800;
+    }
+    .perfil-card {
+      padding: 28px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+    .perfil-hero {
+      display: grid;
+      gap: 14px;
+    }
+    .perfil-chip {
+      display: inline-flex;
+      width: fit-content;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(250,204,21,.26);
+      background: rgba(127,29,29,.18);
+      color: #fcd34d;
+      font-weight: 800;
+      font-size: .88rem;
+      letter-spacing: .04em;
+    }
+    .perfil-title {
+      font-size: clamp(2rem, 5vw, 3.1rem);
+      line-height: 1.02;
+      letter-spacing: -.03em;
     }
     .perfil-status {
       color: #cbd5e1;
-      margin-bottom: 18px;
+      font-size: 1rem;
+      max-width: 54ch;
+    }
+    .perfil-highlight {
+      border-radius: 28px;
+      padding: 20px;
+      border: 1px solid rgba(96,165,250,.18);
+      background:
+        radial-gradient(circle at top right, rgba(59,130,246,.18), transparent 30%),
+        linear-gradient(180deg, rgba(2,6,23,.82), rgba(15,23,42,.72));
+      display: grid;
+      gap: 14px;
+      align-content: center;
+      text-align: center;
+    }
+    .perfil-highlight img {
+      width: 124px;
+      height: 124px;
+      border-radius: 999px;
+      object-fit: cover;
+      margin: 0 auto;
+      border: 3px solid rgba(239,68,68,.82);
+      box-shadow: 0 0 26px rgba(239,68,68,.22);
+    }
+    .perfil-highlight strong {
+      font-size: 1.1rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #f8fafc;
+    }
+    .perfil-highlight p {
+      color: #cbd5e1;
+      font-size: .96rem;
+    }
+    .perfil-panel {
+      padding: 22px;
+      display: grid;
+      gap: 16px;
     }
     .perfil-grid {
       display: grid;
-      gap: 12px;
-      margin-bottom: 22px;
-      text-align: left;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
     }
     .perfil-item {
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: rgba(15,23,42,.72);
+      padding: 16px 18px;
+      border-radius: 22px;
+      background: rgba(15,23,42,.70);
       border: 1px solid rgba(96,165,250,.16);
+      min-width: 0;
     }
     .perfil-item span {
       display: block;
       font-size: 12px;
       color: #93c5fd;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: .10em;
     }
@@ -79,56 +181,109 @@
       word-break: break-word;
     }
     .perfil-actions {
-      display: grid;
-      gap: 10px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
     }
     .perfil-link, .perfil-btn {
-      width: 100%;
       border: 0;
-      border-radius: 14px;
-      padding: 14px 16px;
+      border-radius: 999px;
+      padding: 14px 20px;
       font-weight: 800;
       text-decoration: none;
       cursor: pointer;
-      transition: transform .18s ease, opacity .18s ease;
+      transition: transform .18s ease, opacity .18s ease, box-shadow .18s ease;
     }
     .perfil-link {
       color: #fff;
       background: linear-gradient(135deg, #2563eb, #4f46e5);
+      box-shadow: 0 10px 22px rgba(59,130,246,.18);
     }
     .perfil-btn {
       color: #fff;
       background: linear-gradient(135deg, #dc2626, #ea580c);
+      box-shadow: 0 10px 22px rgba(220,38,38,.18);
     }
-    .perfil-link:hover, .perfil-btn:hover { transform: translateY(-1px); opacity: .96; }
+    .perfil-link:hover, .perfil-btn:hover {
+      transform: translateY(-1px);
+      opacity: .96;
+    }
+    @media (max-width: 860px) {
+      .perfil-topbar,
+      .perfil-card {
+        border-radius: 24px;
+      }
+      .perfil-topbar,
+      .perfil-card {
+        grid-template-columns: 1fr;
+      }
+      .perfil-topbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .perfil-nav {
+        justify-content: stretch;
+      }
+      .perfil-nav a {
+        text-align: center;
+        flex: 1 1 160px;
+      }
+      .perfil-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
-  <main class="perfil-card">
-    <img class="perfil-logo" src="/logosrevis.png" alt="LUFFY LUXE STORE" />
-    <p class="perfil-brand">LUFFY LUXE STORE</p>
-    <h1>Mi perfil</h1>
-    <p class="perfil-status" id="profileStatus">Cargando sesión...</p>
+  <main class="perfil-shell">
+    <header class="perfil-topbar">
+      <div class="perfil-brandbox">
+        <img class="perfil-logo" src="/logosrevis.png" alt="LUFFY LUXE STORE" />
+        <div class="perfil-brandtext">
+          <img class="perfil-brandimg" src="/generated_textX.png" alt="LUFFY LUXE STORE" />
+          <p class="perfil-brandline">Tu cuenta ya forma parte del barco.</p>
+        </div>
+      </div>
+      <nav class="perfil-nav">
+        <a href="/">Inicio</a>
+        <a href="/productos">Productos</a>
+      </nav>
+    </header>
 
-    <section class="perfil-grid">
-      <article class="perfil-item">
-        <span>Nombre</span>
-        <strong id="profileName">-</strong>
-      </article>
-      <article class="perfil-item">
-        <span>Correo</span>
-        <strong id="profileEmail">-</strong>
-      </article>
-      <article class="perfil-item">
-        <span>Estado</span>
-        <strong id="profileState">Validando acceso</strong>
-      </article>
+    <section class="perfil-card">
+      <div class="perfil-hero">
+        <span class="perfil-chip">Mi cuenta</span>
+        <h1 class="perfil-title">Perfil de usuario</h1>
+        <p class="perfil-status" id="profileStatus">Cargando sesión...</p>
+      </div>
+      <aside class="perfil-highlight">
+        <img src="/logosrevis.png" alt="LUFFY LUXE STORE" />
+        <strong>LUFFY LUXE STORE</strong>
+        <p>Accede a tu cuenta, revisa tu sesión y entra al catálogo limpio cuando lo volvamos a activar.</p>
+      </aside>
     </section>
 
-    <div class="perfil-actions">
-      <a class="perfil-link" href="/productos">Ir al catálogo</a>
-      <button class="perfil-btn" id="logoutBtn" type="button">Cerrar sesión</button>
-    </div>
+    <section class="perfil-panel">
+      <div class="perfil-grid">
+        <article class="perfil-item">
+          <span>Nombre</span>
+          <strong id="profileName">-</strong>
+        </article>
+        <article class="perfil-item">
+          <span>Correo</span>
+          <strong id="profileEmail">-</strong>
+        </article>
+        <article class="perfil-item">
+          <span>Estado</span>
+          <strong id="profileState">Validando acceso</strong>
+        </article>
+      </div>
+
+      <div class="perfil-actions">
+        <a class="perfil-link" href="/productos">Ir a productos</a>
+        <button class="perfil-btn" id="logoutBtn" type="button">Cerrar sesión</button>
+      </div>
+    </section>
   </main>
 
   <script>
