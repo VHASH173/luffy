@@ -504,36 +504,17 @@ app.post("/api/orders", requireAuth, async (req, res) => {
   }
 });
 
-// Rutas limpias (sin .html)
-// UNICA VENTANA DE ACCESO: Google-only (google.html).
-app.get("/google", (req, res) => res.sendFile(path.join(__dirname, "google.html")));
-// Todo flujo de acceso => /google
-app.get("/login",        (req, res) => res.redirect("/google"));
-app.get("/ingresar",     (req, res) => res.redirect("/google"));
-app.get("/login-manual", (req, res) => res.redirect("/google"));
-app.get("/unirme",       (req, res) => res.redirect("/google"));
-app.get("/register",     (req, res) => res.redirect("/google"));
-app.get("/signup",       (req, res) => res.redirect("/google"));
-// Si alguien intenta abrir los .html antiguos directamente => Google.
-app.get("/login.html",   (req, res) => res.redirect("/google"));
-app.get("/unirme.html",  (req, res) => res.redirect("/google"));
-// Rutas internas de la app.
-app.get("/premios",      (req, res) => res.redirect("/productos"));
+// Rutas de administración
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "admin.html"));
+});
 
-// Protegemos páginas HTML
-function protectHtml(redirectTo = "/login") {
-  return (req, res, next) => {
-    const user = getUserFromReq(req);
-    if (!user) return res.redirect(redirectTo);
-    next();
-  };
-}
-app.get("/productos.html", (req, res) => res.sendFile(path.join(__dirname, "productos.html")));
-app.get("/productos", (req, res) => res.sendFile(path.join(__dirname, "productos.html")));
-app.get("/perfil.html", protectHtml("/login"));
-app.get("/perfil", protectHtml("/login"));
-app.get("/admin.html", (req, res) => res.sendFile(path.join(__dirname, "admin.html")));
-app.get("/admin", (req, res) => res.sendFile(path.join(__dirname, "admin.html")));
+app.get("/admin.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "admin.html"));
+});
+
+// Rutas limpias (sin .html)
+// Login normal de usuario => Google OAuth
 app.get("/leaderboard", (req, res) => res.redirect("/productos"));
 app.get("/leaderboard.html", (req, res) => res.redirect("/productos"));
 
