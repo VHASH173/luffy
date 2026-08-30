@@ -205,10 +205,11 @@ process.on("unhandledRejection", (e) => {
 (function seedDefaultUser() {
   const users = loadUsers();
   if (!users.find(u => u.email === "luffy@onepiece.com")) {
+    const adminPassword = process.env.ADMIN_PASSWORD || "nakama123";
     users.push({
       id: Date.now(),
       email: "luffy@onepiece.com",
-      password: bcrypt.hashSync("nakama123", 10),
+      password: bcrypt.hashSync(adminPassword, 10),
       nombre: "Luffy Demo",
       createdAt: new Date().toISOString(),
     });
@@ -505,17 +506,17 @@ app.post("/api/orders", requireAuth, async (req, res) => {
 });
 
 // Rutas limpias (sin .html)
-// UNICA VENTANA DE ACCESO: Google-only (google.html).
+// Login normal de usuario => Google OAuth
 app.get("/google", (req, res) => res.sendFile(path.join(__dirname, "google.html")));
-// Todo flujo de acceso => /google
 app.get("/login",        (req, res) => res.redirect("/google"));
 app.get("/ingresar",     (req, res) => res.redirect("/google"));
-app.get("/login-manual", (req, res) => res.redirect("/google"));
+// Login de admin con credenciales en el backend
+app.get("/login-manual", (req, res) => res.sendFile(path.join(__dirname, "login.html")));
 app.get("/unirme",       (req, res) => res.redirect("/google"));
 app.get("/register",     (req, res) => res.redirect("/google"));
 app.get("/signup",       (req, res) => res.redirect("/google"));
-// Si alguien intenta abrir los .html antiguos directamente => Google.
-app.get("/login.html",   (req, res) => res.redirect("/google"));
+// Si alguien intenta abrir .html antiguos directamente => Admin login
+app.get("/login.html",   (req, res) => res.redirect("/login-manual"));
 app.get("/unirme.html",  (req, res) => res.redirect("/google"));
 // Rutas internas de la app.
 app.get("/premios",      (req, res) => res.redirect("/productos"));
@@ -532,8 +533,8 @@ app.get("/productos.html", (req, res) => res.sendFile(path.join(__dirname, "prod
 app.get("/productos", (req, res) => res.sendFile(path.join(__dirname, "productos.html")));
 app.get("/perfil.html", protectHtml("/login"));
 app.get("/perfil", protectHtml("/login"));
-app.get("/admin.html", protectHtml("/login"));
-app.get("/admin", protectHtml("/login"));
+app.get("/admin.html", protectHtml("/login-manual"));
+app.get("/admin", protectHtml("/login-manual"));
 app.get("/leaderboard", (req, res) => res.redirect("/productos"));
 app.get("/leaderboard.html", (req, res) => res.redirect("/productos"));
 
