@@ -485,7 +485,7 @@ app.get("/api/products", async (req, res) => {
   try { res.json({ status: "success", items: await listProductsStore() }); }
   catch (err) { res.status(500).json({ status: "error", message: "No se pudieron cargar los productos." }); }
 });
-const multer = require("multer");
+
 const upload = multer({ 
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
@@ -494,8 +494,6 @@ const upload = multer({
     else cb(new Error("Solo se permiten imágenes"));
   }
 });
-
-// ... existing code ...
 
 app.post("/api/admin/upload-image", requireAdmin, upload.single("image"), async (req, res) => {
   if (!ensureFirestore(res)) return;
