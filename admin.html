@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Admin · LUFFY LUXE STORE</title>
+  <link rel="shortcut icon" href="/logosrevis.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", sans-serif; }
+    body {
+      min-height: 100vh;
+      padding: 24px;
+      color: #fff;
+      background:
+        radial-gradient(circle at top left, rgba(227, 0, 0, 0.16), transparent 28%),
+        radial-gradient(circle at top right, rgba(59, 130, 246, 0.14), transparent 24%),
+        linear-gradient(180deg, #090b16 0%, #05070d 100%);
+    }
+    .wrap {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 22px;
+    }
+    .card {
+      border-radius: 28px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      background: linear-gradient(180deg, rgba(8, 12, 22, 0.92), rgba(5, 10, 18, 0.84));
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.34);
+      padding: 22px;
+      backdrop-filter: blur(16px);
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+    .brand .logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 999px;
+      border: 3px solid rgba(239, 68, 68, 0.82);
+      object-fit: cover;
+      flex: 0 0 auto;
+    }
+    .brand .text {
+      max-width: 260px;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+    .nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .nav a,
+    .btn {
+      text-decoration: none;
+      border: 0;
+      cursor: pointer;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      font-weight: 800;
+    }
+    .btn.sec {
+      background: linear-gradient(135deg, #dc2626, #ea580c);
+    }
+    .btn.danger {
+      background: linear-gradient(135deg, #b91c1c, #ea580c);
+    }
+    .title {
+      font-size: clamp(1.9rem, 4vw, 2.8rem);
+      margin-bottom: 8px;
+    }
+    .muted {
+      color: #cbd5e1;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 18px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+    .field.full {
+      grid-column: 1 / -1;
+    }
+    label {
+      font-size: 0.9rem;
+      color: #93c5fd;
+      font-weight: 700;
+    }
+    input,
+    textarea {
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(96, 165, 250, 0.18);
+      background: rgba(15, 23, 42, 0.72);
+      color: #fff;
+      padding: 14px 16px;
+      outline: none;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    .checks {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(96, 165, 250, 0.18);
+      background: rgba(15, 23, 42, 0.72);
+    }
+    .check input {
+      width: auto;
+    }
+    .status {
+      margin-top: 12px;
+      color: #cbd5e1;
+    }
+    .list {
+      display: grid;
+      gap: 12px;
+    }
+    .item {
+      display: grid;
+      grid-template-columns: 84px 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 14px;
+      border-radius: 22px;
+      border: 1px solid rgba(96, 165, 250, 0.16);
+      background: rgba(15, 23, 42, 0.68);
+    }
+    .item img {
+      width: 84px;
+      height: 84px;
+      border-radius: 18px;
+      object-fit: cover;
+      background: #0f172a;
+    }
+    .item h4 {
+      font-size: 1.05rem;
+      margin-bottom: 4px;
+    }
+    .item p {
+      color: #cbd5e1;
+      font-size: 0.92rem;
+    }
+    .chip {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(127, 29, 29, 0.18);
+      border: 1px solid rgba(250, 204, 21, 0.26);
+      color: #fcd34d;
+      font-size: 0.8rem;
+      font-weight: 800;
+      margin-top: 6px;
+    }
+    .empty {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.55);
+      color: #cbd5e1;
+      text-align: center;
+    }
+    @media (max-width: 860px) {
+      .grid,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .item {
+        grid-template-columns: 1fr;
+      }
+      .item img {
+        width: 100%;
+        height: 180px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card topbar">
+      <div class="brand">
+        <img class="logo" src="/logosrevis.png" alt="LUFFY LUXE STORE" />
+        <img class="text" src="/assets/generated_textX.png" alt="LUFFY LUXE STORE" />
+      </div>
+      <nav class="nav">
+        <a href="/perfil">Mi perfil</a>
+        <a href="/productos">Productos</a>
+      </nav>
+    </section>
+
+    <section class="card">
+      <h1 class="title">Panel de productos</h1>
+      <p class="muted" id="adminStatus">Validando acceso...</p>
+    </section>
+
+    <section class="grid">
+      <section class="card">
+        <h2 style="margin-bottom:14px">Nuevo producto</h2>
+        <form id="productForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="name">Nombre</label>
+              <input id="name" required />
+            </div>
+            <div class="field">
+              <label for="category">Categoría</label>
+              <input id="category" placeholder="Streaming, Gaming, etc." />
+            </div>
+            <div class="field">
+              <label for="price">Precio</label>
+              <input id="price" type="number" min="0" step="0.01" required />
+            </div>
+            <div class="field">
+              <label for="image">Foto URL</label>
+              <input id="image" type="url" placeholder="https://..." required />
+            </div>
+            <div class="field full">
+              <label for="description">Descripción</label>
+              <textarea id="description" required></textarea>
+            </div>
+            <div class="field full">
+              <label>Métodos de pago</label>
+              <div class="checks">
+                <label class="check"><input type="checkbox" value="yape" checked /> Yape</label>
+                <label class="check"><input type="checkbox" value="plin" checked /> Plin</label>
+                <label class="check"><input type="checkbox" value="transferencia" /> Transferencia</label>
+              </div>
+            </div>
+            <div class="field full">
+              <label class="check"><input id="active" type="checkbox" checked /> Producto activo</label>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn" type="submit">Guardar producto</button>
+            <button class="btn sec" type="reset">Limpiar</button>
+          </div>
+          <p class="status" id="formStatus"></p>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2 style="margin-bottom:14px">Productos guardados</h2>
+        <div id="productList" class="list">
+          <div class="empty">Cargando productos...</div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const $ = (s) => document.querySelector(s);
+      const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+      async function fetchJSON(url, options) {
+        const response = await fetch(url, {
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data.status === "error") {
+          throw new Error(data.message || "Error de servidor");
+        }
+        return data;
+      }
+
+      function currency(value) {
+        return "S/ " + Number(value || 0).toFixed(2);
+      }
+
+      function checkedMethods() {
+        return $$(".check input[type='checkbox']")
+          .filter((input) => input.checked && input.value)
+          .map((input) => input.value);
+      }
+
+      function setAdminStatus(text, ok) {
+        const el = $("#adminStatus");
+        el.textContent = text;
+        el.style.color = ok ? "#86efac" : "#fca5a5";
+      }
+
+      async function loadProducts() {
+        const box = $("#productList");
+        try {
+          const data = await fetchJSON("/api/products");
+          const items = Array.isArray(data.items) ? data.items : [];
+          if (!items.length) {
+            box.innerHTML = '<div class="empty">Aún no hay productos publicados.</div>';
+            return;
+          }
+          box.innerHTML = items.map((item) => `
+            <article class="item">
+              <img src="${item.image || "/logosrevis.png"}" alt="${item.name || "Producto"}" />
+              <div>
+                <h4>${item.name || "Sin nombre"}</h4>
+                <p>${item.description || "Sin descripción"}</p>
+                <p>${currency(item.price)} · ${item.category || "General"}</p>
+                <span class="chip">${(item.paymentMethods || []).join(" · ") || "Sin pagos"}</span>
+              </div>
+              <button class="btn danger" data-delete="${item.id}">Borrar</button>
+            </article>
+          `).join("");
+
+          box.querySelectorAll("[data-delete]").forEach((button) => {
+            button.addEventListener("click", async function () {
+              const id = this.getAttribute("data-delete");
+              if (!confirm("¿Borrar este producto?")) return;
+              try {
+                await fetchJSON("/api/admin/products/" + encodeURIComponent(id), { method: "DELETE" });
+                loadProducts();
+              } catch (error) {
+                alert(error.message || "No se pudo borrar");
+              }
+            });
+          });
+        } catch (error) {
+          box.innerHTML = '<div class="empty">No se pudieron cargar los productos.</div>';
+        }
+      }
+
+      async function init() {
+        try {
+          const cfg = await fetchJSON("/api/store/config");
+          if (!cfg.isAdmin) {
+            setAdminStatus("No tienes permisos de admin para entrar a este panel.", false);
+            $("#productForm").style.display = "none";
+            $("#productList").innerHTML = '<div class="empty">Acceso denegado.</div>';
+            return;
+          }
+          setAdminStatus("Admin activo. Aquí puedes subir y borrar productos.", true);
+          loadProducts();
+        } catch (error) {
+          setAdminStatus(error.message || "No se pudo validar tu acceso.", false);
+          $("#productForm").style.display = "none";
+        }
+      }
+
+      $("#productForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const status = $("#formStatus");
+        status.textContent = "Guardando producto...";
+        try {
+          await fetchJSON("/api/admin/products", {
+            method: "POST",
+            body: JSON.stringify({
+              name: $("#name").value.trim(),
+              category: $("#category").value.trim(),
+              price: $("#price").value,
+              image: $("#image").value.trim(),
+              description: $("#description").value.trim(),
+              paymentMethods: checkedMethods(),
+              active: $("#active").checked,
+            }),
+          });
+          this.reset();
+          $("#active").checked = true;
+          status.textContent = "Producto guardado correctamente.";
+          status.style.color = "#86efac";
+          loadProducts();
+        } catch (error) {
+          status.textContent = error.message || "No se pudo guardar.";
+          status.style.color = "#fca5a5";
+        }
+      });
+
+      init();
+    })();
+  </script>
+</body>
+</html>

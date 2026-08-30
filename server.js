@@ -96,6 +96,64 @@ try {
 } catch (e) {
   console.warn("Firestore no disponible:", e && e.message);
 }
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "luffy@onepiece.com").split(",").map(v => v.trim().toLowerCase()).filter(Boolean);
+const WHATSAPP_ADMIN_NUMBER = (process.env.WHATSAPP_ADMIN_NUMBER || "").replace(/\D/g, "");
+const PAYMENT_METHODS = [
+  { id: "yape", label: "Yape", target: process.env.YAPE_NUMBER || "" },
+  { id: "plin", label: "Plin", target: process.env.PLIN_NUMBER || "" },
+  { id: "transferencia", label: "Transferencia", target: process.env.BANK_ACCOUNT || "" },
+].filter(x => x.target);
+function ensureFirestore(res) {
+  if (firestoreDb) return true;
+  res.status(503).json({ status: "error", message: "Firestore no está configurado todavía." });
+  return false;
+}
+function isAdminEmail(email) {
+  return ADMIN_EMAILS.includes((email || "").toLowerCase());
+}
+async function listProductsStore() {
+  const snap = await firestoreDb.collection("products").orderBy("createdAt", "desc").get();
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(item => item.active !== false);
+}
+async function saveProductStore(payload, editor) {
+  const now = new Date().toISOString();
+  const id = payload.id || String(Date.now());
+  const product = {
+    id,
+    name: String(payload.name || "").trim(),
+    description: String(payload.description || "").trim(),
+    price: Number(payload.price || 0),
+    image: String(payload.image || "").trim(),
+    category: String(payload.category || "General").trim(),
+    paymentMethods: Array.isArray(payload.paymentMethods) && payload.paymentMethods.length ? payload.paymentMethods : ["yape", "plin"],
+    active: payload.active !== false,
+    createdAt: payload.createdAt || now,
+    updatedAt: now,
+    createdBy: payload.createdBy || editor.email,
+  };
+  await firestoreDb.collection("products").doc(id).set(product, { merge: true });
+  return product;
+}
+async function createOrderStore(payload, user) {
+  const order = {
+    id: `ORD-${Date.now()}`,
+    productId: String(payload.productId || ""),
+    productName: String(payload.productName || ""),
+    amount: Number(payload.amount || 0),
+    paymentMethod: String(payload.paymentMethod || "yape"),
+    note: String(payload.note || "").trim(),
+    status: "pending_payment",
+    createdAt: new Date().toISOString(),
+    user: { id: user.id, email: user.email, nombre: user.nombre },
+  };
+  await firestoreDb.collection("orders").doc(order.id).set(order, { merge: true });
+  return order;
+}
+function buildWhatsAppUrl(order) {
+  if (!WHATSAPP_ADMIN_NUMBER) return "";
+  const text = ["Hola LUFFY LUXE STORE", `Pedido: ${order.id}`, `Producto: ${order.productName}`, `Monto: S/ ${order.amount}`, `Pago: ${order.paymentMethod}`, "Adjuntaré mi captura por este chat."].join("\n");
+  return `https://wa.me/${WHATSAPP_ADMIN_NUMBER}?text=${encodeURIComponent(text)}`;
+}
 function syncUserToFile(user) {
   const users = loadUsers();
   const ix = users.findIndex(u => u.email === user.email);
@@ -178,6 +236,13 @@ function getUserFromReq(req) {
 function requireAuth(req, res, next) {
   const user = getUserFromReq(req);
   if (!user) return res.status(401).json({ status: "error", message: "Sesión inválida" });
+  req.user = user;
+  next();
+}
+function requireAdmin(req, res, next) {
+  const user = getUserFromReq(req);
+  if (!user) return res.status(401).json({ status: "error", message: "Sesión inválida" });
+  if (!isAdminEmail(user.email)) return res.status(403).json({ status: "error", message: "No eres admin." });
   req.user = user;
   next();
 }
@@ -400,17 +465,35 @@ app.get("/api/me", (req, res) => {
   const user = getUserFromReq(req);
   res.set("X-Luffy-Auth-Cookie", rawToken ? "present" : "missing");
   res.set("X-Luffy-Auth-State", user ? "valid" : (rawToken ? "invalid" : "missing"));
-  if (!user) {
-    return res.json({
-      authed: false,
-      debug: { cookie: !!rawToken, state: rawToken ? "invalid" : "missing" },
-    });
+  if (!user) return res.json({ authed: false, debug: { cookie: !!rawToken, state: rawToken ? "invalid" : "missing" } });
+  res.json({ authed: true, user: { id: user.id, email: user.email, nombre: user.nombre }, isAdmin: isAdminEmail(user.email), debug: { cookie: true, state: "valid" } });
+});
+app.get("/api/store/config", requireAuth, (req, res) => {
+  res.json({ status: "success", isAdmin: isAdminEmail(req.user.email), whatsappNumber: WHATSAPP_ADMIN_NUMBER, paymentMethods: PAYMENT_METHODS });
+});
+app.get("/api/products", requireAuth, async (req, res) => {
+  if (!ensureFirestore(res)) return;
+  try { res.json({ status: "success", items: await listProductsStore() }); }
+  catch (err) { res.status(500).json({ status: "error", message: "No se pudieron cargar los productos." }); }
+});
+app.post("/api/admin/products", requireAdmin, async (req, res) => {
+  if (!ensureFirestore(res)) return;
+  try { res.json({ status: "success", item: await saveProductStore(req.body || {}, req.user) }); }
+  catch (err) { res.status(500).json({ status: "error", message: "No se pudo guardar el producto." }); }
+});
+app.delete("/api/admin/products/:id", requireAdmin, async (req, res) => {
+  if (!ensureFirestore(res)) return;
+  try { await firestoreDb.collection("products").doc(String(req.params.id)).delete(); res.json({ status: "success" }); }
+  catch (err) { res.status(500).json({ status: "error", message: "No se pudo borrar el producto." }); }
+});
+app.post("/api/orders", requireAuth, async (req, res) => {
+  if (!ensureFirestore(res)) return;
+  try {
+    const order = await createOrderStore(req.body || {}, req.user);
+    res.json({ status: "success", order, whatsappUrl: buildWhatsAppUrl(order), paymentMethods: PAYMENT_METHODS });
+  } catch (err) {
+    res.status(500).json({ status: "error", message: "No se pudo registrar el pedido." });
   }
-  res.json({
-    authed: true,
-    user: { id: user.id, email: user.email, nombre: user.nombre },
-    debug: { cookie: true, state: "valid" },
-  });
 });
 
 // Rutas limpias (sin .html)
@@ -441,6 +524,8 @@ app.get("/productos.html", protectHtml("/login"));
 app.get("/productos", protectHtml("/login"));
 app.get("/perfil.html", protectHtml("/login"));
 app.get("/perfil", protectHtml("/login"));
+app.get("/admin.html", protectHtml("/login"));
+app.get("/admin", protectHtml("/login"));
 app.get("/leaderboard", (req, res) => res.redirect("/productos"));
 app.get("/leaderboard.html", (req, res) => res.redirect("/productos"));
 
