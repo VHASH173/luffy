@@ -417,7 +417,13 @@
               </div>
               <div class="field">
                 <label for="category">Categoría</label>
-                <input id="category" placeholder="Streaming, Gaming, etc." />
+                <select id="category">
+                  <option value="Streaming">Streaming</option>
+                  <option value="Gaming">Gaming</option>
+                  <option value="Tecnología">Tecnología</option>
+                  <option value="Entretenimiento">Entretenimiento</option>
+                  <option value="Otros">Otros</option>
+                </select>
               </div>
               <div class="field">
                 <label for="price">Precio</label>
@@ -458,6 +464,55 @@
             <p class="status" id="formStatus"></p>
           </form>
           </section>
+
+<section class="card">
+             <h2 style="margin-bottom:14px">Configuración del Admin</h2>
+             <p class="muted" style="margin-bottom:16px;">Número de teléfono para contacto y WhatsApp.</p>
+             <form id="adminConfigForm">
+               <div class="form-grid">
+                 <div class="field">
+                   <label for="adminPhone">Teléfono del Admin (con código de país)</label>
+                   <input id="adminPhone" type="tel" placeholder="+51918871372" />
+                 </div>
+               </div>
+               <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+                 <button class="btn" type="submit">Guardar Configuración</button>
+               </div>
+               <p class="status" id="configStatus"></p>
+             </form>
+           </section>
+
+           <!-- Configuración de QR de pagos -->
+           <section class="card">
+             <h2 style="margin-bottom:14px">Configuración de QR de pagos</h2>
+             <p class="muted" style="margin-bottom:16px;">Sube tus propios códigos QR para cada método. Se usarán en los modales de pago.</p>
+             <form id="qrConfigForm">
+               <div class="form-grid">
+                 <div class="field">
+                   <label>Yape - Subir QR</label>
+                   <input type="file" id="qrYape" accept="image/*" />
+                   <img id="qrYapePreview" src="" alt="QR Yape" style="max-width:120px; margin-top:8px; display:none; border-radius:8px; border:1px solid #334155;" />
+                   <p class="muted" style="font-size:0.75rem; margin-top:4px;">URL actual: <span id="qrYapeUrl">-</span></p>
+                 </div>
+                 <div class="field">
+                   <label>Plin - Subir QR</label>
+                   <input type="file" id="qrPlin" accept="image/*" />
+                   <img id="qrPlinPreview" src="" alt="QR Plin" style="max-width:120px; margin-top:8px; display:none; border-radius:8px; border:1px solid #334155;" />
+                   <p class="muted" style="font-size:0.75rem; margin-top:4px;">URL actual: <span id="qrPlinUrl">-</span></p>
+                 </div>
+                 <div class="field">
+                   <label>Transferencia - Subir QR</label>
+                   <input type="file" id="qrTransferencia" accept="image/*" />
+                   <img id="qrTransferenciaPreview" src="" alt="QR Transferencia" style="max-width:120px; margin-top:8px; display:none; border-radius:8px; border:1px solid #334155;" />
+                   <p class="muted" style="font-size:0.75rem; margin-top:4px;">URL actual: <span id="qrTransferenciaUrl">-</span></p>
+                 </div>
+               </div>
+               <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+                 <button class="btn" type="submit">Guardar QR</button>
+               </div>
+               <p class="status" id="qrStatus"></p>
+             </form>
+           </section>
 
           <section class="card">
             <h2 style="margin-bottom:14px">Vista previa</h2>
@@ -506,10 +561,10 @@
   </div>
 
   <!-- Botón WhatsApp para enviar comprobante (aparece en vista previa) -->
-  <a class="whatsapp-btn" id="whatsappReceiptBtn" href="#" target="_blank" style="display:none;">
-    <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-    Enviar comprobante por WhatsApp
-  </a>
+<a class="whatsapp-btn" id="whatsappReceiptBtn" href="https://wa.me/51918871372" target="_blank" style="display:none;">
+     <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+     Enviar comprobante por WhatsApp
+   </a>
 
   <script>
     (() => {
@@ -527,6 +582,15 @@ async function fetchJSON(url, options) {
           throw new Error(data.message || "Error de servidor");
         }
         return data;
+      }
+
+      let storeSettings = {};
+
+      async function loadSettings() {
+        try {
+          const data = await fetchJSON("/api/admin/settings");
+          if (data.settings) storeSettings = data.settings;
+        } catch (_) {}
       }
 
       async function uploadImage(file) {
@@ -559,12 +623,13 @@ async function fetchJSON(url, options) {
 
       function syncPreview() {
         const name = $("#name").value.trim() || "Nombre del producto";
-        const category = $("#category").value.trim() || "General";
+        const category = $("#category").value || "General";
         const description = $("#description").value.trim() || "Aquí verás la descripción del producto antes de guardarlo.";
         const price = $("#price").value || "0";
         const methods = getSelectedMethods();
         const imageFile = $("#image").files[0];
         const imagePreview = imageFile ? URL.createObjectURL(imageFile) : "/logosrevis.png";
+        const waNumber = storeSettings.whatsappNumber || "51918871372";
 
         $("#previewName").textContent = name;
         $("#previewCategory").textContent = category;
@@ -573,37 +638,36 @@ async function fetchJSON(url, options) {
         $("#previewPrice").textContent = currency(price);
         $("#previewPayments").innerHTML = (methods.length ? methods : ["sin pagos"]).map((method) => `<span class="chip">${method}</span>`).join("");
 
-        // Mostrar botón WhatsApp en preview si hay métodos
         const waBtn = $("#whatsappReceiptBtn");
         if (methods.length) {
           const text = `Hola, quiero pagar por *${name}* (${currency(price)}). Método: ${methods.join(", ")}. Adjunto comprobante.`;
-          waBtn.href = `https://wa.me/51918871372?text=${encodeURIComponent(text)}`;
+          waBtn.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
           waBtn.style.display = "flex";
         } else {
           waBtn.style.display = "none";
         }
       }
 
-      // Payment modal data
-      const paymentData = {
-        yape: {
+      function renderPaymentData() {
+        const s = storeSettings;
+        paymentData.yape = {
           title: "Pagar con Yape",
-          qr: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=YAPE%3A%20918871372",
-          number: "918 871 372",
+          qr: s.yapeQR || "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=YAPE%3A%20" + (s.yapeNumber || "918871372"),
+          number: (s.yapeNumber || "918 871 372"),
           note: "Escanea el QR desde la app Yape o transfiere al número"
-        },
-        plin: {
+        };
+        paymentData.plin = {
           title: "Pagar con Plin",
-          qr: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PLIN%3A%20918871372",
-          number: "918 871 372",
+          qr: s.plinQR || "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PLIN%3A%20" + (s.plinNumber || "918871372"),
+          number: (s.plinNumber || "918 871 372"),
           note: "Escanea el QR desde la app Plin o usa el número"
-        },
-        transferencia: {
+        };
+        paymentData.transferencia = {
           title: "Transferencia Bancaria",
-          qr: "",
-          number: "BCP - 193-12345678-0-12\nCCI: 002-193-001234567890-12\nTitular: LUFFY LUXE STORE",
+          qr: s.transferQR || "",
+          number: s.transferInfo || "BCP - 193-12345678-0-12\nCCI: 002-193-001234567890-12\nTitular: LUFFY LUXE STORE",
           note: "Realiza la transferencia y guarda el comprobante"
-        }
+        };
       }
 
       function openPaymentModal(method) {
@@ -633,6 +697,16 @@ async function fetchJSON(url, options) {
         el.style.color = ok ? "#86efac" : "#fca5a5";
       }
 
+      function setConfigStatus(text, ok) {
+        const el = $("#configStatus");
+        if (el) { el.textContent = text; el.style.color = ok ? "#86efac" : "#fca5a5"; }
+      }
+
+      function setQRStatus(text, ok) {
+        const el = $("#qrStatus");
+        if (el) { el.textContent = text; el.style.color = ok ? "#86efac" : "#fca5a5"; }
+      }
+
       // Payment button handlers
       $$(".payment-btn").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -654,59 +728,71 @@ async function fetchJSON(url, options) {
       });
 
       // WhatsApp receipt button
-      $("#whatsappReceiptBtn").addEventListener("click", (e) => {
-        // El href ya se setea en syncPreview
+      $("#whatsappReceiptBtn").addEventListener("click", (e) => {});
+
+      // Admin config form handler
+      $("#adminConfigForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        try {
+          const phone = $("#adminPhone").value.trim();
+          await fetchJSON("/api/admin/settings", {
+            method: "PUT",
+            body: JSON.stringify({ whatsappNumber: phone })
+          });
+          storeSettings.whatsappNumber = phone;
+          setConfigStatus("Configuración guardada ✓", true);
+        } catch (err) {
+          setConfigStatus(err.message || "Error al guardar", false);
+        }
       });
 
-      function setAdminStatus(text, ok) {
-        const el = $("#adminStatus");
-        el.textContent = text;
-        el.style.color = ok ? "#86efac" : "#fca5a5";
-      }
-
-      async function loadProducts() {
-        const box = $("#productList");
+      // QR config form handler
+      $("#qrConfigForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
         try {
-          const data = await fetchJSON("/api/products");
-          const items = Array.isArray(data.items) ? data.items : [];
-          if (!items.length) {
-            box.innerHTML = '<div class="empty">Aún no hay productos publicados.</div>';
+          const payload = {};
+          const qrFields = { qrYape: "yapeQR", qrPlin: "plinQR", qrTransferencia: "transferQR" };
+          for (const [inputId, key] of Object.entries(qrFields)) {
+            const fileInput = document.getElementById(inputId);
+            if (fileInput && fileInput.files[0]) {
+              const url = await uploadImage(fileInput.files[0]);
+              payload[key] = url;
+            }
+          }
+          if (Object.keys(payload).length === 0) {
+            setQRStatus("Selecciona al menos una imagen QR", false);
             return;
           }
-          box.innerHTML = items.map((item) => `
-            <article class="item">
-              <img class="item-img" src="${item.image || "/logosrevis.png"}" alt="${item.name || "Producto"}" />
-              <div class="item-info">
-                <h4>${item.name || "Sin nombre"}</h4>
-                <p>${item.description || "Sin descripción"}</p>
-                <p>${currency(item.price)} · ${item.category || "General"}</p>
-                <span class="chip">${(item.paymentMethods || []).join(" · ") || "Sin pagos"}</span>
-              </div>
-              <div class="item-actions">
-                <button class="btn danger" data-delete="${item.id}">Borrar</button>
-              </div>
-            </article>
-          `).join("");
-
-          box.querySelectorAll("[data-delete]").forEach((button) => {
-            button.addEventListener("click", async function () {
-              const id = this.getAttribute("data-delete");
-              if (!confirm("¿Borrar este producto?")) return;
-              try {
-                await fetchJSON("/api/admin/products/" + encodeURIComponent(id), { method: "DELETE" });
-                loadProducts();
-              } catch (error) {
-                alert(error.message || "No se pudo borrar");
-              }
-            });
-          });
-        } catch (error) {
-          box.innerHTML = '<div class="empty">No se pudieron cargar los productos.</div>';
+          await fetchJSON("/api/admin/settings", { method: "PUT", body: JSON.stringify(payload) });
+          storeSettings = { ...storeSettings, ...payload };
+          renderPaymentData();
+          updateQRPreviews();
+          setQRStatus("QR guardado ✓", true);
+        } catch (err) {
+          setQRStatus(err.message || "Error al guardar QR", false);
         }
+      });
+
+      async function updateQRPreviews() {
+        const s = storeSettings;
+        if ($("#qrYapeUrl")) $("#qrYapeUrl").textContent = s.yapeQR || "-";
+        if ($("#qrPlinUrl")) $("#qrPlinUrl").textContent = s.plinQR || "-";
+        if ($("#qrTransferenciaUrl")) $("#qrTransferenciaUrl").textContent = s.transferQR || "-";
+        if (s.yapeQR) { const img = $("#qrYapePreview"); img.src = s.yapeQR; img.style.display = "block"; }
+        if (s.plinQR) { const img = $("#qrPlinPreview"); img.src = s.plinQR; img.style.display = "block"; }
+        if (s.transferQR) { const img = $("#qrTransferenciaPreview"); img.src = s.transferQR; img.style.display = "block"; }
       }
 
+      // Load settings on init
       async function init() {
         try {
+          await loadSettings();
+          renderPaymentData();
+          updateQRPreviews();
+          // Set admin phone field
+          if ($("#adminPhone") && storeSettings.whatsappNumber) {
+            $("#adminPhone").value = "+" + storeSettings.whatsappNumber;
+          }
           const cfg = await fetchJSON("/api/store/config");
           if (!cfg.isAdmin) {
             setAdminStatus("Inicia sesión para gestionar la tienda.", false);
@@ -802,10 +888,11 @@ async function fetchJSON(url, options) {
       });
 
       // Preview sync on input changes
-      ["#name", "#category", "#description", "#price"].forEach(selector => {
+      ["#name", "#description", "#price"].forEach(selector => {
         const node = $(selector);
         if (node) node.addEventListener("input", syncPreview);
       });
+      $("#category").addEventListener("change", syncPreview);
       $("#image").addEventListener("change", syncPreview);
 
       init();

@@ -86,24 +86,73 @@ function upsertGoogleUser(profile) {
 }
 
 let firestoreDb = null;
+let firebaseBucketName = process.env.FIREBASE_STORAGE_BUCKET || "";
 try {
   const projectId = process.env.FIREBASE_PROJECT_ID || "";
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || "";
   const privateKey = (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n");
+  if (!firebaseBucketName && projectId) {
+    firebaseBucketName = `${projectId}.appspot.com`;
+  }
   if (projectId && clientEmail && privateKey) {
-    if (!admin.apps.length) admin.initializeApp({ credential: admin.credential.cert({ projectId, clientEmail, privateKey }) });
+    if (!admin.apps.length) {
+      admin.initializeApp({
+        credential: admin.credential.cert({ projectId, clientEmail, privateKey }),
+        storageBucket: firebaseBucketName
+      });
+    }
     firestoreDb = admin.firestore();
   }
 } catch (e) {
   console.warn("Firestore no disponible:", e && e.message);
 }
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "luffy@onepiece.com").split(",").map(v => v.trim().toLowerCase()).filter(Boolean);
-const WHATSAPP_ADMIN_NUMBER = (process.env.WHATSAPP_ADMIN_NUMBER || "").replace(/\D/g, "");
-const PAYMENT_METHODS = [
-  { id: "yape", label: "Yape", target: process.env.YAPE_NUMBER || "" },
-  { id: "plin", label: "Plin", target: process.env.PLIN_NUMBER || "" },
-  { id: "transferencia", label: "Transferencia", target: process.env.BANK_ACCOUNT || "" },
-].filter(x => x.target);
+let storeSettings = {
+  whatsappNumber: (process.env.WHATSAPP_ADMIN_NUMBER || "51918871372").replace(/\D/g, ""),
+  yapeNumber: process.env.YAPE_NUMBER || "918871372",
+  yapeQR: "",
+  plinNumber: process.env.PLIN_NUMBER || "918871372",
+  plinQR: "",
+  transferInfo: process.env.BANK_ACCOUNT || "BCP - 193-12345678-0-12 (CCI: 002-193-001234567890-12)",
+  transferQR: ""
+};
+
+const SETTINGS_PATH = path.join(__dirname, "settings.json");
+function loadSettingsLocal() {
+  try {
+    if (fs.existsSync(SETTINGS_PATH)) {
+      const raw = fs.readFileSync(SETTINGS_PATH, "utf-8");
+      if (raw) Object.assign(storeSettings, JSON.parse(raw));
+    }
+  } catch (_) {}
+}
+function saveSettingsLocal(data) {
+  try {
+    fs.writeFileSync(SETTINGS_PATH, JSON.stringify(data, null, 2), "utf-8");
+  } catch (_) {}
+}
+loadSettingsLocal();
+
+async function getStoreSettings() {
+  if (firestoreDb) {
+    try {
+      const snap = await firestoreDb.collection("settings").doc("store").get();
+      if (snap.exists) {
+        storeSettings = { ...storeSettings, ...snap.data() };
+        saveSettingsLocal(storeSettings);
+      }
+    } catch (_) {}
+  }
+  return storeSettings;
+}
+
+function buildPaymentMethodsList(settings) {
+  return [
+    { id: "yape", label: "Yape", target: settings.yapeNumber || "", qr: settings.yapeQR || "" },
+    { id: "plin", label: "Plin", target: settings.plinNumber || "", qr: settings.plinQR || "" },
+    { id: "transferencia", label: "Transferencia", target: settings.transferInfo || "", qr: settings.transferQR || "" },
+  ];
+}
 function ensureFirestore(res) {
   if (firestoreDb) return true;
   res.status(503).json({ status: "error", message: "Firestore no está configurado todavía." });
@@ -498,23 +547,45 @@ const upload = multer({
 app.post("/api/admin/upload-image", requireAdmin, upload.single("image"), async (req, res) => {
   if (!ensureFirestore(res)) return;
   if (!req.file) return res.status(400).json({ status: "error", message: "No se recibió archivo" });
-  
   try {
-    const bucket = admin.storage().bucket();
+    const bucketName = firebaseBucketName || `${process.env.FIREBASE_PROJECT_ID}.appspot.com`;
+    const bucket = admin.storage().bucket(bucketName);
     const fileName = `products/${Date.now()}-${req.file.originalname.replace(/\s+/g, "_")}`;
     const file = bucket.file(fileName);
-    
-    await file.save(req.file.buffer, {
-      metadata: { contentType: req.file.mimetype },
-      public: true,
-      validation: "md5"
-    });
-    
+    await file.save(req.file.buffer, { metadata: { contentType: req.file.mimetype }, public: true, resumable: false });
     const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
     res.json({ status: "success", url: publicUrl });
   } catch (err) {
-    console.error("Upload error:", err);
+    console.error("Upload error details:", err.code, err.message, err.errors || err.stack);
     res.status(500).json({ status: "error", message: "Error al subir imagen" });
+  }
+});
+
+app.get("/api/admin/settings", requireAdmin, async (req, res) => {
+  try {
+    const settings = await getStoreSettings();
+    res.json({ status: "success", settings });
+  } catch (err) {
+    res.status(500).json({ status: "error", message: "No se pudieron cargar los ajustes." });
+  }
+});
+app.put("/api/admin/settings", requireAdmin, express.json(), async (req, res) => {
+  try {
+    const { whatsappNumber, yapeNumber, yapeQR, plinNumber, plinQR, transferInfo, transferQR } = req.body || {};
+    if (whatsappNumber) storeSettings.whatsappNumber = String(whatsappNumber).replace(/\D/g, "");
+    if (yapeNumber !== undefined) storeSettings.yapeNumber = String(yapeNumber);
+    if (yapeQR !== undefined) storeSettings.yapeQR = String(yapeQR);
+    if (plinNumber !== undefined) storeSettings.plinNumber = String(plinNumber);
+    if (plinQR !== undefined) storeSettings.plinQR = String(plinQR);
+    if (transferInfo !== undefined) storeSettings.transferInfo = String(transferInfo);
+    if (transferQR !== undefined) storeSettings.transferQR = String(transferQR);
+    saveSettingsLocal(storeSettings);
+    if (firestoreDb) {
+      try { await firestoreDb.collection("settings").doc("store").set(storeSettings, { merge: true }); } catch (_) {}
+    }
+    res.json({ status: "success", settings: storeSettings });
+  } catch (err) {
+    res.status(500).json({ status: "error", message: "No se pudieron guardar los ajustes." });
   }
 });
 
