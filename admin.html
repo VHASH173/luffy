@@ -384,25 +384,8 @@
     </section>
 
     <section class="card" id="loginCard" style="display:none; max-width:500px; margin: 40px auto;">
-      <h2 style="margin-bottom:14px; text-align:center;">Acceso Restringido</h2>
-      <p class="muted" style="text-align:center; margin-bottom:20px;">Ingresa tus credenciales de administrador para continuar.</p>
-      <form id="adminLoginForm">
-        <div class="stack">
-          <div class="field">
-            <label>Correo Electrónico</label>
-            <input type="email" id="adminEmail" placeholder="admin@ejemplo.com" required />
-          </div>
-          <div class="field">
-            <label>Contraseña</label>
-            <div style="position:relative;">
-              <input type="password" id="adminPass" placeholder="••••••••" required style="width:100%;padding-right:40px;" />
-              <button type="button" onclick="const p=document.getElementById('adminPass');const i=this.querySelector('span');if(p.type==='password'){p.type='text';i.textContent='🙈';}else{p.type='password';i.textContent='👁️';}" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;padding:4px;"><span>👁️</span></button>
-            </div>
-          </div>
-          <button class="btn" type="submit" style="width:100%; margin-top:10px;">Entrar al Panel</button>
-          <p id="loginError" style="color:#fca5a5; font-size:0.9rem; text-align:center; margin-top:10px;"></p>
-        </div>
-      </form>
+      <h2 style="margin-bottom:14px; text-align:center;">Sesión requerida</h2>
+      <p class="muted" style="text-align:center;">Tu sesión expiró. <a href="/admin.html?k=modogalacticosupergey" style="color:#60a5fa;">Recarga la página</a> para continuar.</p>
     </section>
 
     <div id="adminContent" style="display:none;">
@@ -575,6 +558,9 @@
         const adminToken = getAdminToken();
         const baseHeaders = { "Content-Type": "application/json" };
         if (adminToken) baseHeaders["Authorization"] = "Bearer " + adminToken;
+        // Enviar token de URL como header para que el server lo acepte
+        const urlKey = new URLSearchParams(window.location.search).get("k");
+        if (urlKey) baseHeaders["X-Admin-Token"] = urlKey;
         const response = await fetch(url, {
           credentials: "include",
           ...options,
@@ -617,6 +603,8 @@
         const adminToken = getAdminToken();
         const headers = {};
         if (adminToken) headers["Authorization"] = "Bearer " + adminToken;
+        const urlKey = new URLSearchParams(window.location.search).get("k");
+        if (urlKey) headers["X-Admin-Token"] = urlKey;
         const response = await fetch("/api/admin/upload-image", {
           method: "POST",
           credentials: "include",
@@ -846,7 +834,7 @@
       };
 
       async function init() {
-        // Paso 1: Cargar settings (no bloqueante)
+        // Paso 1: Cargar settings
         await loadSettings();
         try {
           renderPaymentData();
@@ -865,7 +853,17 @@
           }
         } catch (_) {}
 
-        // Paso 2: Verificar si es admin
+        // Paso 2: Si tiene token de URL válido, mostrar panel directo
+        const urlKey = new URLSearchParams(window.location.search).get("k");
+        if (urlKey === "modogalacticosupergey") {
+          setAdminStatus("Admin activo. Aquí puedes subir y borrar productos.", true);
+          $("#loginCard").style.display = "none";
+          $("#adminContent").style.display = "block";
+          loadProducts();
+          return;
+        }
+
+        // Paso 3: Sin token de URL, intentar con JWT
         try {
           setAdminStatus("Verificando acceso...", false);
           const controller = new AbortController();
@@ -880,7 +878,7 @@
 
           if (!cfg.isAdmin) {
             localStorage.removeItem("LUFFY_ADMIN_TOKEN");
-            setAdminStatus("Inicia sesión para gestionar la tienda.", false);
+            setAdminStatus("Sesión requerida. Accede con el link correcto.", false);
             $("#loginCard").style.display = "block";
             $("#adminContent").style.display = "none";
             return;
@@ -897,43 +895,6 @@
           $("#adminContent").style.display = "none";
         }
       }
-
-      $("#adminLoginForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
-        const err = $("#loginError");
-        const btn = e.target.querySelector('button[type="submit"]');
-        err.textContent = "Validando...";
-        btn.disabled = true;
-        try {
-          const resp = await fetch("/admin/login", {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email: $("#adminEmail").value.trim(),
-              password: $("#adminPass").value,
-            }),
-          });
-          const data = await resp.json().catch(() => ({}));
-          if (data.status === "success" && data.token) {
-            localStorage.setItem("LUFFY_ADMIN_TOKEN", data.token);
-            err.textContent = "Bienvenido " + (data.user?.nombre || "Admin") + ". Cargando panel...";
-            err.style.color = "#86efac";
-            btn.disabled = true;
-            // Recargar manteniendo el token de acceso en la URL
-            const params = new URLSearchParams(window.location.search);
-            window.location.href = "/admin.html?" + params.toString();
-          } else {
-            err.textContent = data.message || "Credenciales incorrectas";
-            err.style.color = "#fca5a5";
-          }
-        } catch (error) {
-          err.textContent = error.message || "Error al conectar con el servidor";
-          err.style.color = "#fca5a5";
-        } finally {
-          btn.disabled = false;
-        }
-      });
 
       $("#productForm").addEventListener("submit", async function (event) {
         event.preventDefault();

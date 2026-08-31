@@ -299,6 +299,14 @@ function getAdminFromReq(req) {
   if (process.env.DEV_BYPASS === "true" || process.env.DEV_MODE === "true") {
     return { id: 0, email: ADMIN_EMAILS[0] || "dev@local", nombre: "Dev Admin", role: "admin" };
   }
+
+  // Aceptar token de acceso por header o query param
+  const accessHeader = req.headers?.["x-admin-token"] || "";
+  const accessQuery = (req.query?.k || "").toString();
+  if (accessHeader === ADMIN_ACCESS_TOKEN || accessQuery === ADMIN_ACCESS_TOKEN) {
+    return { id: 0, email: ADMIN_EMAILS[0] || "admin@local", nombre: "Admin", role: "admin" };
+  }
+
   const authHeader = req.headers?.authorization || "";
   const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
 
