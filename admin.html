@@ -116,6 +116,7 @@
       color: #93c5fd;
       font-weight: 700;
     }
+    select,
     input,
     textarea {
       width: 100%;
@@ -127,6 +128,7 @@
       outline: none;
       font-size: clamp(0.95rem, 2.5vw, 1rem);
     }
+    select option { background: #0f172a; color: #fff; }
     textarea {
       min-height: 110px;
       resize: vertical;
@@ -404,6 +406,26 @@
                 <input id="price" type="number" min="0" step="0.01" required placeholder="25.00" />
               </div>
               <div class="field">
+                <label for="category">Categoría</label>
+                <select id="category" required>
+                  <option value="">Elegir...</option>
+                  <option value="Netflix">Netflix</option>
+                  <option value="Disney+">Disney+</option>
+                  <option value="HBO Max">HBO Max</option>
+                  <option value="Amazon Prime">Amazon Prime</option>
+                  <option value="Paramount+">Paramount+</option>
+                  <option value="Spotify">Spotify</option>
+                  <option value="YouTube Premium">YouTube Premium</option>
+                  <option value="Crunchyroll">Crunchyroll</option>
+                  <option value="Apple TV+">Apple TV+</option>
+                  <option value="Office 365">Office 365</option>
+                  <option value="Canva Pro">Canva Pro</option>
+                  <option value="ChatGPT Plus">ChatGPT Plus</option>
+                  <option value="Juegos">Juegos</option>
+                  <option value="Otros">Otros</option>
+                </select>
+              </div>
+              <div class="field">
                 <label for="image">Foto</label>
                 <input id="image" type="file" accept="image/*" required />
                 <p class="muted" style="font-size:0.75rem; margin-top:4px;">Máx 5MB</p>
@@ -580,7 +602,7 @@
             method: "POST",
             body: JSON.stringify({
               name: $("#name").value.trim(),
-              category: "General",
+              category: $("#category").value,
               price: $("#price").value,
               image: imageUrl,
               description: $("#description").value.trim(),
