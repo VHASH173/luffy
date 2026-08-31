@@ -841,7 +841,8 @@
             localStorage.setItem("LUFFY_ADMIN_TOKEN", data.token);
             err.textContent = "Bienvenido " + (data.user?.nombre || "Admin") + ". Cargando panel...";
             err.style.color = "#86efac";
-            init();
+            btn.disabled = true;
+            location.reload();
           } else {
             err.textContent = data.message || "Credenciales incorrectas";
             err.style.color = "#fca5a5";
