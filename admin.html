@@ -592,6 +592,20 @@
 
       async function loadSettings() {
         try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 8000);
+          const resp = await fetch("/api/store/config", {
+            credentials: "include",
+            signal: controller.signal
+          });
+          clearTimeout(timeout);
+          const data = await resp.json().catch(() => ({}));
+          if (data.status === "success") {
+            storeSettings.whatsappNumber = data.whatsappNumber || "";
+          }
+        } catch (_) {}
+        // Intentar cargar ajustes admin (requiere auth, puede fallar)
+        try {
           const data = await fetchJSON("/api/admin/settings");
           if (data.settings) storeSettings = data.settings;
         } catch (_) {}
@@ -832,8 +846,9 @@
       };
 
       async function init() {
+        // Paso 1: Cargar settings (no bloqueante)
+        await loadSettings();
         try {
-          await loadSettings().catch(() => {});
           renderPaymentData();
           updateQRPreviews();
           if ($("#adminPhone") && storeSettings.whatsappNumber) {
@@ -848,14 +863,21 @@
           if ($("#transferInfoInput") && storeSettings.transferInfo) {
             $("#transferInfoInput").value = storeSettings.transferInfo;
           }
-        } catch (e) { console.warn("Settings load error:", e); }
+        } catch (_) {}
 
+        // Paso 2: Verificar si es admin
         try {
           setAdminStatus("Verificando acceso...", false);
-          const cfg = await Promise.race([
-            fetchJSON("/api/store/config"),
-            new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 15000))
-          ]);
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 10000);
+          const resp = await fetch("/api/store/config", {
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            signal: controller.signal
+          });
+          clearTimeout(timeout);
+          const cfg = await resp.json().catch(() => ({}));
+
           if (!cfg.isAdmin) {
             localStorage.removeItem("LUFFY_ADMIN_TOKEN");
             setAdminStatus("Inicia sesión para gestionar la tienda.", false);
@@ -870,7 +892,7 @@
         } catch (error) {
           console.error("Init error:", error);
           localStorage.removeItem("LUFFY_ADMIN_TOKEN");
-          setAdminStatus("Error de conexión. Intenta de nuevo.", false);
+          setAdminStatus("Error de conexión. Recarga la página.", false);
           $("#loginCard").style.display = "block";
           $("#adminContent").style.display = "none";
         }
