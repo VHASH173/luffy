@@ -798,7 +798,7 @@
               <img class="item-img" src="${p.image || '/logosrevis.png'}" alt="${p.name}" />
               <div class="item-info">
                 <h4>${p.name}</h4>
-                <p>${p.description ? p.description.substring(0, 80) + (p.description.length > 80 ? '...' : '') : ''}</p>
+                <p style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${p.description ? p.description.substring(0, 100) + (p.description.length > 100 ? '...' : '') : ''}</p>
                 <p><span class="chip">${p.category || 'General'}</span> <span class="preview-price" style="font-size:0.85rem">${currency(p.price)}</span></p>
               </div>
               <div class="item-actions">

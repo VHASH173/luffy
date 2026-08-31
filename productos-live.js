@@ -208,7 +208,7 @@
         <div style="padding:18px;display:grid;gap:10px;">
           <span style="display:inline-flex;width:fit-content;padding:6px 10px;border-radius:999px;background:rgba(127,29,29,.18);border:1px solid rgba(250,204,21,.26);color:#fcd34d;font-size:.8rem;font-weight:800;">${escapeHtml(item.category || "General")}</span>
           <h3 style="margin:0;color:#fff;font-size:1.18rem;">${escapeHtml(item.name || "Sin nombre")}</h3>
-          <p style="margin:0;color:#cbd5e1;min-height:68px;">${escapeHtml(item.description || "Sin descripción")}</p>
+          <p style="margin:0;color:#cbd5e1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;max-height:4.5em;">${escapeHtml(item.description || "Sin descripción")}</p>
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
             <strong style="font-size:1.15rem;color:#fff;">${currency(item.price)}</strong>
             <button data-buy="${escapeHtml(item.id)}" type="button" style="border:0;cursor:pointer;padding:12px 18px;border-radius:999px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;font-weight:800;">Comprar</button>
