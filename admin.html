@@ -375,6 +375,7 @@
         <img class="text" src="/generated_textX.png" alt="LUFFY LUXE STORE" />
       </div>
       <nav class="nav">
+        <button onclick="localStorage.removeItem('LUFFY_ADMIN_TOKEN'); location.reload();" style="background:none;border:1px solid #f87171;color:#f87171;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:0.85rem;">Cerrar sesion</button>
       </nav>
     </section>
 
@@ -569,10 +570,17 @@
       const $ = (s) => document.querySelector(s);
       const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-async function fetchJSON(url, options) {
+      function getAdminToken() {
+        return localStorage.getItem("LUFFY_ADMIN_TOKEN") || "";
+      }
+
+      async function fetchJSON(url, options) {
+        const adminToken = getAdminToken();
+        const headers = { "Content-Type": "application/json" };
+        if (adminToken) headers["Authorization"] = "Bearer " + adminToken;
         const response = await fetch(url, {
           credentials: "include",
-          headers: { "Content-Type": "application/json" },
+          headers,
           ...options,
         });
         const data = await response.json().catch(() => ({}));
@@ -795,6 +803,7 @@ async function fetchJSON(url, options) {
         try {
           const cfg = await fetchJSON("/api/store/config");
           if (!cfg.isAdmin) {
+            localStorage.removeItem("LUFFY_ADMIN_TOKEN");
             setAdminStatus("Inicia sesión para gestionar la tienda.", false);
             $("#loginCard").style.display = "block";
             $("#adminContent").style.display = "none";
@@ -805,6 +814,7 @@ async function fetchJSON(url, options) {
           $("#adminContent").style.display = "block";
           loadProducts();
         } catch (error) {
+          localStorage.removeItem("LUFFY_ADMIN_TOKEN");
           setAdminStatus("Sesión requerida.", false);
           $("#loginCard").style.display = "block";
           $("#adminContent").style.display = "none";
@@ -820,7 +830,6 @@ async function fetchJSON(url, options) {
         try {
           const resp = await fetch("/admin/login", {
             method: "POST",
-            credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               email: $("#adminEmail").value.trim(),
@@ -828,11 +837,11 @@ async function fetchJSON(url, options) {
             }),
           });
           const data = await resp.json().catch(() => ({}));
-          if (data.status === "success") {
+          if (data.status === "success" && data.token) {
+            localStorage.setItem("LUFFY_ADMIN_TOKEN", data.token);
             err.textContent = "Bienvenido " + (data.user?.nombre || "Admin") + ". Cargando panel...";
             err.style.color = "#86efac";
-            await new Promise(r => setTimeout(r, 300));
-            location.reload();
+            init();
           } else {
             err.textContent = data.message || "Credenciales incorrectas";
             err.style.color = "#fca5a5";

@@ -291,7 +291,11 @@ function getUserFromReq(req) {
   }
 }
 function getAdminFromReq(req) {
-  const token = req.cookies?.auth_token || req.cookies?.admin_token;
+  let token = req.cookies?.auth_token || req.cookies?.admin_token;
+  if (!token) {
+    const auth = req.headers?.authorization || "";
+    if (auth.startsWith("Bearer ")) token = auth.slice(7);
+  }
   if (!token) return null;
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
@@ -404,6 +408,7 @@ app.post("/admin/login", async (req, res) => {
 
     return res.json({
       status: "success",
+      token: token,
       user: { id: user.id, email: user.email, nombre: user.nombre },
     });
   } catch (err) {
