@@ -375,8 +375,6 @@
         <img class="text" src="/generated_textX.png" alt="LUFFY LUXE STORE" />
       </div>
       <nav class="nav">
-        <a href="/perfil">Mi perfil</a>
-        <a href="/productos">Productos</a>
       </nav>
     </section>
 
@@ -786,13 +784,15 @@ async function fetchJSON(url, options) {
       // Load settings on init
       async function init() {
         try {
-          await loadSettings();
+          await loadSettings().catch(() => {});
           renderPaymentData();
           updateQRPreviews();
-          // Set admin phone field
           if ($("#adminPhone") && storeSettings.whatsappNumber) {
             $("#adminPhone").value = "+" + storeSettings.whatsappNumber;
           }
+        } catch (_) {}
+
+        try {
           const cfg = await fetchJSON("/api/store/config");
           if (!cfg.isAdmin) {
             setAdminStatus("Inicia sesión para gestionar la tienda.", false);
@@ -816,15 +816,18 @@ async function fetchJSON(url, options) {
         const err = $("#loginError");
         err.textContent = "Validando...";
         try {
-          const data = await fetchJSON("/admin/login", {
+          const resp = await fetch("/admin/login", {
             method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               email: $("#adminEmail").value.trim(),
               password: $("#adminPass").value,
             }),
           });
+          const data = await resp.json().catch(() => ({}));
           if (data.status === "success") {
-            location.reload();
+            init();
           } else {
             err.textContent = data.message || "Credenciales incorrectas";
           }
