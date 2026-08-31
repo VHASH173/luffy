@@ -278,7 +278,7 @@ function signAdminToken(user) {
   return jwt.sign(
     { id: user.id, email: user.email, nombre: user.nombre, role: "admin" },
     JWT_SECRET,
-    { expiresIn: "24h" }
+    { expiresIn: "7d" }
   );
 }
 function getUserFromReq(req) {
@@ -291,7 +291,7 @@ function getUserFromReq(req) {
   }
 }
 function getAdminFromReq(req) {
-  const token = req.cookies?.admin_token;
+  const token = req.cookies?.auth_token || req.cookies?.admin_token;
   if (!token) return null;
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
@@ -393,12 +393,14 @@ app.post("/admin/login", async (req, res) => {
     }
 
     const token = signAdminToken(user);
-    res.cookie("admin_token", token, {
+    const cookieOpts = {
       httpOnly: true,
       sameSite: "lax",
       secure: !!process.env.RENDER_EXTERNAL_URL,
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    };
+    res.cookie("auth_token", token, cookieOpts);
+    res.cookie("admin_token", token, cookieOpts);
 
     return res.json({
       status: "success",
