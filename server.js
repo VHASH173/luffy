@@ -200,9 +200,9 @@ async function createOrderStore(payload, user) {
   return order;
 }
 function buildWhatsAppUrl(order) {
-  if (!WHATSAPP_ADMIN_NUMBER) return "";
+  if (!storeSettings.whatsappNumber) return "";
   const text = ["Hola LUFFY LUXE STORE", `Pedido: ${order.id}`, `Producto: ${order.productName}`, `Monto: S/ ${order.amount}`, `Pago: ${order.paymentMethod}`, "Adjuntaré mi captura por este chat."].join("\n");
-  return `https://wa.me/${WHATSAPP_ADMIN_NUMBER}?text=${encodeURIComponent(text)}`;
+  return `https://wa.me/${storeSettings.whatsappNumber}?text=${encodeURIComponent(text)}`;
 }
 function syncUserToFile(user) {
   const users = loadUsers();
@@ -521,12 +521,13 @@ app.get("/api/me", (req, res) => {
 });
 app.get("/api/store/config", (req, res) => {
   const user = getUserFromReq(req);
+  const s = storeSettings;
   res.json({
     status: "success",
     authed: !!user,
     isAdmin: !!user && isAdminEmail(user.email),
-    whatsappNumber: WHATSAPP_ADMIN_NUMBER,
-    paymentMethods: PAYMENT_METHODS,
+    whatsappNumber: s.whatsappNumber,
+    paymentMethods: buildPaymentMethodsList(s),
   });
 });
 app.get("/api/products", async (req, res) => {
@@ -603,7 +604,7 @@ app.post("/api/orders", requireAuth, async (req, res) => {
   if (!ensureFirestore(res)) return;
   try {
     const order = await createOrderStore(req.body || {}, req.user);
-    res.json({ status: "success", order, whatsappUrl: buildWhatsAppUrl(order), paymentMethods: PAYMENT_METHODS });
+    res.json({ status: "success", order, whatsappUrl: buildWhatsAppUrl(order), paymentMethods: buildPaymentMethodsList(storeSettings) });
   } catch (err) {
     res.status(500).json({ status: "error", message: "No se pudo registrar el pedido." });
   }
