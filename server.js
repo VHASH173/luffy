@@ -90,11 +90,13 @@ let firebaseBucketName = process.env.FIREBASE_STORAGE_BUCKET || "";
 try {
   const projectId = process.env.FIREBASE_PROJECT_ID || "";
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || "";
-  const privateKey = (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n");
+  let privateKey = process.env.FIREBASE_PRIVATE_KEY || "";
+  if (privateKey.includes("\\n")) privateKey = privateKey.replace(/\\n/g, "\n");
   if (!firebaseBucketName && projectId) {
     firebaseBucketName = `${projectId}.appspot.com`;
   }
-  if (projectId && clientEmail && privateKey) {
+  console.log(`[Firebase] projectId=${projectId}, bucket=${firebaseBucketName}, clientEmail=${clientEmail ? "OK" : "MISSING"}, privateKey=${privateKey.length > 10 ? "OK (" + privateKey.length + " chars)" : "MISSING"}`);
+  if (projectId && clientEmail && privateKey.length > 10) {
     if (!admin.apps.length) {
       admin.initializeApp({
         credential: admin.credential.cert({ projectId, clientEmail, privateKey }),
@@ -102,6 +104,9 @@ try {
       });
     }
     firestoreDb = admin.firestore();
+    console.log("[Firebase] Firestore + Storage inicializado OK");
+  } else {
+    console.warn("[Firebase] Faltan variables de entorno. No se conectó a Firebase.");
   }
 } catch (e) {
   console.warn("Firestore no disponible:", e && e.message);
@@ -155,7 +160,7 @@ function buildPaymentMethodsList(settings) {
 }
 function ensureFirestore(res) {
   if (firestoreDb) return true;
-  res.status(503).json({ status: "error", message: "Firestore no está configurado todavía." });
+  res.status(503).json({ status: "error", message: "Firebase no está conectado. Revisa las variables de entorno FIREBASE_* en Render." });
   return false;
 }
 function isAdminEmail(email) {
@@ -634,15 +639,21 @@ app.post("/api/admin/upload-image", requireAdmin, upload.single("image"), async 
   if (!req.file) return res.status(400).json({ status: "error", message: "No se recibió archivo" });
   try {
     const bucketName = firebaseBucketName || `${process.env.FIREBASE_PROJECT_ID}.appspot.com`;
+    console.log(`[Upload] Subiendo a bucket: ${bucketName}, archivo: ${req.file.originalname}, tamaño: ${req.file.size} bytes`);
     const bucket = admin.storage().bucket(bucketName);
     const fileName = `products/${Date.now()}-${req.file.originalname.replace(/\s+/g, "_")}`;
     const file = bucket.file(fileName);
     await file.save(req.file.buffer, { metadata: { contentType: req.file.mimetype }, public: true, resumable: false });
     const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+    console.log(`[Upload] OK: ${publicUrl}`);
     res.json({ status: "success", url: publicUrl });
   } catch (err) {
-    console.error("Upload error details:", err.code, err.message, err.errors || err.stack);
-    res.status(500).json({ status: "error", message: "Error al subir imagen" });
+    console.error("[Upload] Error:", err.code || err.message, err.message, err.errors || err.stack);
+    const detail = err.code === "storage/unauthorized" ? "Reglas de Storage no permiten escritura. Revisa Firebase Console → Storage → Reglas."
+      : err.code === "storage/bucket-not-found" ? `Bucket '${firebaseBucketName}' no encontrado. Agrega FIREBASE_STORAGE_BUCKET en Render.`
+      : err.code === "app/invalid-credential" ? "Credenciales de Firebase inválidas. Revisa FIREBASE_PRIVATE_KEY en Render."
+      : err.message || "Error desconocido";
+    res.status(500).json({ status: "error", message: detail });
   }
 });
 
