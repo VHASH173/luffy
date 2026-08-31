@@ -814,7 +814,9 @@ async function fetchJSON(url, options) {
       $("#adminLoginForm").addEventListener("submit", async function (e) {
         e.preventDefault();
         const err = $("#loginError");
+        const btn = e.target.querySelector('button[type="submit"]');
         err.textContent = "Validando...";
+        btn.disabled = true;
         try {
           const resp = await fetch("/admin/login", {
             method: "POST",
@@ -827,12 +829,19 @@ async function fetchJSON(url, options) {
           });
           const data = await resp.json().catch(() => ({}));
           if (data.status === "success") {
-            init();
+            err.textContent = "Bienvenido " + (data.user?.nombre || "Admin") + ". Cargando panel...";
+            err.style.color = "#86efac";
+            await new Promise(r => setTimeout(r, 300));
+            location.reload();
           } else {
             err.textContent = data.message || "Credenciales incorrectas";
+            err.style.color = "#fca5a5";
           }
         } catch (error) {
           err.textContent = error.message || "Error al conectar con el servidor";
+          err.style.color = "#fca5a5";
+        } finally {
+          btn.disabled = false;
         }
       });
 
