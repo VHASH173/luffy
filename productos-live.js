@@ -124,14 +124,13 @@
       <div style="width:min(100%,560px);border-radius:28px;border:1px solid rgba(96,165,250,.18);background:linear-gradient(180deg,rgba(7,13,24,.96),rgba(4,8,18,.9));box-shadow:0 24px 60px rgba(0,0,0,.34);padding:22px;">
         <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:16px;">
           <div>
-            <p style="color:#93c5fd;font-weight:800;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;">Pago manual</p>
+            <p style="color:#93c5fd;font-weight:800;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;">Pago por Yape</p>
             <h3 id="checkoutTitle" style="font-size:1.4rem;color:#fff;">Comprar producto</h3>
           </div>
           <button id="checkoutClose" type="button" style="border:0;border-radius:999px;background:rgba(239,68,68,.16);color:#fff;width:40px;height:40px;font-size:1.2rem;cursor:pointer;">✕</button>
         </div>
         <p id="checkoutMeta" style="color:#cbd5e1;margin-bottom:14px;"></p>
         <div id="checkoutMethods" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;"></div>
-        <textarea id="checkoutNote" placeholder="Opcional: detalle del pedido o referencia..." style="width:100%;min-height:100px;border-radius:18px;border:1px solid rgba(96,165,250,.18);background:rgba(15,23,42,.72);color:#fff;padding:14px 16px;outline:none;"></textarea>
         <div id="checkoutResult" style="margin-top:14px;color:#cbd5e1;"></div>
       </div>
     `;
@@ -144,44 +143,6 @@
     document.getElementById("checkoutClose").addEventListener("click", () => {
       overlay.style.display = "none";
     });
-  }
-
-  async function submitOrder(methodId) {
-    const method = (state.config.paymentMethods || []).find((item) => item.id === methodId);
-    const result = document.getElementById("checkoutResult");
-    const note = document.getElementById("checkoutNote").value.trim();
-
-    result.textContent = "Registrando pedido...";
-    try {
-      const data = await fetchJSON("/api/orders", {
-        method: "POST",
-        body: JSON.stringify({
-          productId: state.current.id,
-          productName: state.current.name,
-          amount: state.current.presalePrice || state.current.price,
-          paymentMethod: methodId,
-          note,
-        }),
-      });
-
-      const target = method && method.target ? method.target : "Configura este método en Render";
-      const waButton = data.whatsappUrl
-        ? `<a href="${data.whatsappUrl}" target="_blank" rel="noopener" style="display:inline-flex;margin-top:12px;padding:12px 18px;border-radius:999px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;text-decoration:none;font-weight:800;">Enviar pedido por WhatsApp</a>`
-        : "";
-
-      result.innerHTML = `
-        <div style="padding:16px;border-radius:18px;border:1px solid rgba(96,165,250,.18);background:rgba(15,23,42,.6);">
-          <strong style="display:block;color:#86efac;margin-bottom:8px;">Pedido registrado: ${escapeHtml(data.order.id)}</strong>
-          <p style="margin:0 0 8px;color:#e5e7eb;">Método: <strong>${escapeHtml(method ? method.label : methodId)}</strong></p>
-          <p style="margin:0 0 8px;color:#e5e7eb;">Monto: <strong>${currency(state.current.presalePrice || state.current.price)}</strong></p>
-          <p style="margin:0;color:#cbd5e1;">Dato de pago: <strong>${escapeHtml(target)}</strong></p>
-          <p style="margin:10px 0 0;color:#cbd5e1;">Haz el pago y adjunta la captura manualmente por WhatsApp.</p>
-          ${waButton}
-        </div>
-      `;
-    } catch (error) {
-      result.innerHTML = `<span style="color:#fca5a5;">${escapeHtml(error.message || "No se pudo registrar el pedido.")}</span>`;
-    }
   }
 
   function openCheckout(item) {
@@ -197,22 +158,25 @@
     const meta = document.getElementById("checkoutMeta");
     const methods = document.getElementById("checkoutMethods");
     const result = document.getElementById("checkoutResult");
-    const itemMethods = Array.isArray(item.paymentMethods) && item.paymentMethods.length
-      ? item.paymentMethods
-      : ["yape", "plin"];
+    const displayPrice = item.presalePrice || item.price;
+    const yapeNumber = "918871372";
+    const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" + encodeURIComponent("YAPE:" + yapeNumber + ":" + displayPrice);
 
     title.textContent = item.name || "Comprar producto";
-    const displayPrice = item.presalePrice || item.price;
-    meta.textContent = `${currency(displayPrice)}${item.presalePrice ? ' (preventa)' : ''} · ${item.category || "General"}`;
-    result.innerHTML = "";
-    methods.innerHTML = itemMethods.map((methodId) => {
-      const info = (state.config.paymentMethods || []).find((entry) => entry.id === methodId);
-      return `<button data-method="${escapeHtml(methodId)}" type="button" style="border:0;cursor:pointer;padding:12px 16px;border-radius:999px;background:linear-gradient(135deg,#2563eb,#4f46e5);color:#fff;font-weight:800;">${escapeHtml(info ? info.label : methodId)}</button>`;
-    }).join("");
-
-    methods.querySelectorAll("[data-method]").forEach((button) => {
-      button.addEventListener("click", () => submitOrder(button.getAttribute("data-method")));
-    });
+    meta.textContent = currency(displayPrice) + (item.presalePrice ? " (preventa)" : "") + " · " + (item.category || "General");
+    methods.innerHTML = "";
+    result.innerHTML = `
+      <div style="text-align:center;">
+        <p style="color:#93c5fd;font-weight:700;margin:0 0 6px;font-size:.85rem;">Escanea con tu app Yape</p>
+        <img src="${qrUrl}" alt="QR Yape" style="width:200px;height:200px;border-radius:16px;background:#fff;padding:8px;margin:8px auto;display:block;" />
+        <p style="color:#57ff5a;font-family:monospace;font-size:1.1rem;font-weight:700;margin:10px 0 4px;">${yapeNumber}</p>
+        <p style="color:#fcd34d;font-weight:800;font-size:1.2rem;margin:4px 0 10px;">${currency(displayPrice)}</p>
+        <p style="color:#cbd5e1;font-size:.82rem;margin:0 0 12px;">Abre Yape → Escanear → Paga el monto exacto</p>
+        <a href="https://wa.me/51${yapeNumber}?text=${encodeURIComponent("Hola, compré " + item.name + " por " + currency(displayPrice) + ". Adjunto comprobante.")}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;text-decoration:none;font-weight:800;font-size:.9rem;">
+          Enviar comprobante por WhatsApp
+        </a>
+      </div>
+    `;
 
     overlay.style.display = "flex";
   }
