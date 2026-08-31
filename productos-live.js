@@ -58,6 +58,8 @@
     return "S/ " + Number(value || 0).toFixed(2);
   }
 
+  let activeCategory = "Todos";
+
   function bindSearch() {
     const input = $("search-inputdouble");
     const button = $("search-icondouble");
@@ -68,10 +70,37 @@
         : state.items.filter((item) =>
             [item.name, item.description, item.category].join(" ").toLowerCase().includes(q)
           );
-      renderProducts();
+      applyCategoryFilter();
     };
     if (input) input.addEventListener("input", run);
     if (button) button.addEventListener("click", run);
+  }
+
+  function buildCategoryFilters() {
+    const container = $("category-filters");
+    if (!container) return;
+    const cats = [...new Set(state.items.map(i => i.category || "Otros"))].sort();
+    container.innerHTML = "";
+    const allBtn = document.createElement("button");
+    allBtn.textContent = "Todos";
+    allBtn.style.cssText = "border:0;padding:8px 16px;border-radius:999px;font-weight:700;font-size:.85rem;cursor:pointer;white-space:nowrap;" + (activeCategory === "Todos" ? "background:linear-gradient(135deg,#2563eb,#4f46e5);color:#fff;" : "background:rgba(30,41,59,.7);color:#94a3b8;");
+    allBtn.onclick = () => { activeCategory = "Todos"; buildCategoryFilters(); applyCategoryFilter(); };
+    container.appendChild(allBtn);
+    cats.forEach(cat => {
+      const btn = document.createElement("button");
+      btn.textContent = cat;
+      btn.style.cssText = "border:0;padding:8px 16px;border-radius:999px;font-weight:700;font-size:.85rem;cursor:pointer;white-space:nowrap;" + (activeCategory === cat ? "background:linear-gradient(135deg,#2563eb,#4f46e5);color:#fff;" : "background:rgba(30,41,59,.7);color:#94a3b8;");
+      btn.onclick = () => { activeCategory = cat; buildCategoryFilters(); applyCategoryFilter(); };
+      container.appendChild(btn);
+    });
+  }
+
+  function applyCategoryFilter() {
+    const q = String($("search-inputdouble")?.value || "").trim().toLowerCase();
+    let items = q ? state.items.filter(i => [i.name, i.description, i.category].join(" ").toLowerCase().includes(q)) : state.items.slice();
+    if (activeCategory !== "Todos") items = items.filter(i => (i.category || "Otros") === activeCategory);
+    state.filtered = items;
+    renderProducts();
   }
 
   function ensureModal() {
@@ -194,53 +223,33 @@
 
     if (!state.filtered.length) {
       grid.innerHTML = `
-        <section style="width:min(100%,760px);margin:0 auto;padding:26px;border-radius:28px;border:1px solid rgba(96,165,250,.18);background:linear-gradient(180deg,rgba(7,13,24,.92),rgba(4,8,18,.84));box-shadow:0 22px 48px rgba(0,0,0,.26);text-align:center;">
+        <section style="width:min(100%,760px);margin:0 auto;padding:26px;border-radius:28px;border:1px solid rgba(96,165,250,.18);background:linear-gradient(180deg,rgba(7,13,24,.92),rgba(4,8,18,.84));box-shadow:0 22px 48px rgba(0,0,0,.26);text-align:center;grid-column:1/-1;">
           <img src="/logosrevis.png" alt="LUFFY LUXE STORE" style="width:92px;height:92px;object-fit:cover;border-radius:999px;border:3px solid rgba(239,68,68,.82);display:block;margin:0 auto 14px;">
-          <h3 style="margin:0 0 10px;color:#fff;">Aún no hay productos publicados</h3>
-          <p style="margin:0;color:#cbd5e1;">Sube productos desde el panel admin y aquí aparecerán automáticamente.</p>
+          <h3 style="margin:0 0 10px;color:#fff;">${activeCategory !== "Todos" ? "No hay productos en esta categoría" : "Aún no hay productos publicados"}</h3>
+          <p style="margin:0;color:#cbd5e1;">${activeCategory !== "Todos" ? "Prueba otra categoría o sube productos desde el admin." : "Sube productos desde el panel admin y aquí aparecerán automáticamente."}</p>
         </section>
       `;
       return;
     }
 
-    const categories = {};
-    state.filtered.forEach((item) => {
-      const cat = item.category || "Otros";
-      if (!categories[cat]) categories[cat] = [];
-      categories[cat].push(item);
-    });
-
-    const catOrder = ["Netflix","Disney+","HBO Max","Amazon Prime","Paramount+","Apple TV+","Crunchyroll","YouTube Premium","Spotify","Apple Music","YouTube Music","Office 365","Canva Pro","ChatGPT Plus","Adobe","Juegos","Xbox Game Pass","PlayStation Plus","Nintendo","Steam","Relojes","Perfumes","Lentes","Billeteras","Cadenas","Pulseras","Cuentas Streaming","Cuentas Gaming","Cuentas Redes","Otros"];
-    const sortedCats = Object.keys(categories).sort((a, b) => {
-      const ia = catOrder.indexOf(a);
-      const ib = catOrder.indexOf(b);
-      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
-    });
-
-    grid.innerHTML = sortedCats.map(cat => `
-      <section style="grid-column:1/-1;margin-top:12px;">
-        <h2 style="color:#fcd34d;font-size:1.2rem;margin:0 0 12px;padding-left:4px;">${escapeHtml(cat)}</h2>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;">
-          ${categories[cat].map(item => `
-            <article style="border-radius:22px;border:1px solid rgba(96,165,250,.16);background:linear-gradient(180deg,rgba(7,13,24,.94),rgba(4,8,18,.88));box-shadow:0 14px 32px rgba(0,0,0,.22);overflow:hidden;">
-              <img src="${escapeHtml(item.image || "/logosrevis.png")}" alt="${escapeHtml(item.name || "Producto")}" style="width:100%;height:180px;object-fit:cover;background:#0f172a;">
-              <div style="padding:14px;display:grid;gap:8px;">
-                <h3 style="margin:0;color:#fff;font-size:1.05rem;">${escapeHtml(item.name || "Sin nombre")}</h3>
-                <p style="margin:0;color:#cbd5e1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-height:3em;font-size:.88rem;">${escapeHtml(item.description || "Sin descripción")}</p>
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-                  <div>
-                    ${item.presalePrice
-                      ? `<span style="font-size:1rem;color:#fff;text-decoration:line-through;opacity:0.5;margin-right:6px;">${currency(item.price)}</span><strong style="font-size:1rem;color:#86efac;">${currency(item.presalePrice)}</strong>`
-                      : `<strong style="font-size:1rem;color:#fff;">${currency(item.price)}</strong>`
-                    }
-                  </div>
-                  <button data-buy="${escapeHtml(item.id)}" type="button" style="border:0;cursor:pointer;padding:10px 16px;border-radius:999px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;font-weight:800;font-size:.88rem;">Comprar</button>
-                </div>
-              </div>
-            </article>
-          `).join("")}
+    grid.innerHTML = state.filtered.map((item) => `
+      <article style="border-radius:22px;border:1px solid rgba(96,165,250,.16);background:linear-gradient(180deg,rgba(7,13,24,.94),rgba(4,8,18,.88));box-shadow:0 14px 32px rgba(0,0,0,.22);overflow:hidden;">
+        <img src="${escapeHtml(item.image || "/logosrevis.png")}" alt="${escapeHtml(item.name || "Producto")}" style="width:100%;height:180px;object-fit:cover;background:#0f172a;">
+        <div style="padding:14px;display:grid;gap:8px;">
+          <span style="display:inline-flex;width:fit-content;padding:4px 10px;border-radius:999px;background:rgba(127,29,29,.18);border:1px solid rgba(250,204,21,.26);color:#fcd34d;font-size:.75rem;font-weight:800;">${escapeHtml(item.category || "General")}</span>
+          <h3 style="margin:0;color:#fff;font-size:1.05rem;">${escapeHtml(item.name || "Sin nombre")}</h3>
+          <p style="margin:0;color:#cbd5e1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-height:3em;font-size:.88rem;">${escapeHtml(item.description || "Sin descripción")}</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div>
+              ${item.presalePrice
+                ? `<span style="font-size:1rem;color:#fff;text-decoration:line-through;opacity:0.5;margin-right:6px;">${currency(item.price)}</span><strong style="font-size:1rem;color:#86efac;">${currency(item.presalePrice)}</strong>`
+                : `<strong style="font-size:1rem;color:#fff;">${currency(item.price)}</strong>`
+              }
+            </div>
+            <button data-buy="${escapeHtml(item.id)}" type="button" style="border:0;cursor:pointer;padding:10px 16px;border-radius:999px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;font-weight:800;font-size:.88rem;">Comprar</button>
+          </div>
         </div>
-      </section>
+      </article>
     `).join("");
 
     grid.querySelectorAll("[data-buy]").forEach((button) => {
@@ -288,6 +297,7 @@
       );
 
       renderProducts();
+      buildCategoryFilters();
     } catch (error) {
       setStatus("❌ No se pudo cargar el catálogo.", error.message || "Revisa Firestore.");
       const grid = $("stream-container");
