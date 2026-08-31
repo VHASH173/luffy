@@ -705,12 +705,22 @@ app.post("/api/orders", requireAuth, async (req, res) => {
   }
 });
 
-// Rutas de administración
+// Rutas de administración — protegidas con token secreto en URL
+const ADMIN_ACCESS_TOKEN = process.env.ADMIN_ACCESS_TOKEN || "luffy-admin-2026";
+
 app.get("/admin", (req, res) => {
+  const k = (req.query.k || "").toString();
+  if (k !== ADMIN_ACCESS_TOKEN) {
+    return res.status(403).send("<!DOCTYPE html><html><head><title>Acceso denegado</title><style>body{background:#090b16;color:#fff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;text-align:center;}h1{color:#ef4444;}</style></head><body><h1>403 - Acceso denegado</h1><p>No tienes permiso para acceder a esta página.</p></body></html>");
+  }
   res.sendFile(path.join(__dirname, "admin.html"));
 });
 
 app.get("/admin.html", (req, res) => {
+  const k = (req.query.k || "").toString();
+  if (k !== ADMIN_ACCESS_TOKEN) {
+    return res.status(403).send("<!DOCTYPE html><html><head><title>Acceso denegado</title><style>body{background:#090b16;color:#fff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;text-align:center;}h1{color:#ef4444;}</style></head><body><h1>403 - Acceso denegado</h1><p>No tienes permiso para acceder a esta página.</p></body></html>");
+  }
   res.sendFile(path.join(__dirname, "admin.html"));
 });
 

@@ -558,6 +558,15 @@
       const $ = (s) => document.querySelector(s);
       const $$ = (s) => Array.from(document.querySelectorAll(s));
 
+      // Protección: verificar token de acceso en URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const accessKey = urlParams.get("k");
+      const VALID_KEY = "luffy-admin-2026";
+      if (accessKey !== VALID_KEY) {
+        document.body.innerHTML = '<div style="min-height:100vh;display:flex;justify-content:center;align-items:center;background:#090b16;color:#fff;font-family:sans-serif;text-align:center;"><div><h1 style="color:#ef4444;">403 - Acceso denegado</h1><p>No tienes permiso para acceder a esta página.</p></div></div>';
+        return;
+      }
+
       function getAdminToken() {
         return localStorage.getItem("LUFFY_ADMIN_TOKEN") || "";
       }
@@ -839,10 +848,14 @@
           if ($("#transferInfoInput") && storeSettings.transferInfo) {
             $("#transferInfoInput").value = storeSettings.transferInfo;
           }
-        } catch (_) {}
+        } catch (e) { console.warn("Settings load error:", e); }
 
         try {
-          const cfg = await fetchJSON("/api/store/config");
+          setAdminStatus("Verificando acceso...", false);
+          const cfg = await Promise.race([
+            fetchJSON("/api/store/config"),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 15000))
+          ]);
           if (!cfg.isAdmin) {
             localStorage.removeItem("LUFFY_ADMIN_TOKEN");
             setAdminStatus("Inicia sesión para gestionar la tienda.", false);
@@ -855,8 +868,9 @@
           $("#adminContent").style.display = "block";
           loadProducts();
         } catch (error) {
+          console.error("Init error:", error);
           localStorage.removeItem("LUFFY_ADMIN_TOKEN");
-          setAdminStatus("Sesión requerida.", false);
+          setAdminStatus("Error de conexión. Intenta de nuevo.", false);
           $("#loginCard").style.display = "block";
           $("#adminContent").style.display = "none";
         }
@@ -884,7 +898,9 @@
             err.textContent = "Bienvenido " + (data.user?.nombre || "Admin") + ". Cargando panel...";
             err.style.color = "#86efac";
             btn.disabled = true;
-            location.reload();
+            // Recargar manteniendo el token de acceso en la URL
+            const params = new URLSearchParams(window.location.search);
+            window.location.href = "/admin.html?" + params.toString();
           } else {
             err.textContent = data.message || "Credenciales incorrectas";
             err.style.color = "#fca5a5";
