@@ -578,12 +578,12 @@
 
       async function fetchJSON(url, options) {
         const adminToken = getAdminToken();
-        const headers = { "Content-Type": "application/json" };
-        if (adminToken) headers["Authorization"] = "Bearer " + adminToken;
+        const baseHeaders = { "Content-Type": "application/json" };
+        if (adminToken) baseHeaders["Authorization"] = "Bearer " + adminToken;
         const response = await fetch(url, {
           credentials: "include",
-          headers,
           ...options,
+          headers: { ...baseHeaders, ...(options?.headers || {}) },
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok || data.status === "error") {
@@ -791,7 +791,43 @@
         if (s.transferQR) { const img = $("#qrTransferenciaPreview"); img.src = s.transferQR; img.style.display = "block"; }
       }
 
-      // Load settings on init
+      async function loadProducts() {
+        const list = $("#productList");
+        try {
+          const data = await fetchJSON("/api/products");
+          const items = data.items || [];
+          if (!items.length) {
+            list.innerHTML = '<div class="empty">No hay productos guardados aún.</div>';
+            return;
+          }
+          list.innerHTML = items.map(p => `
+            <div class="item">
+              <img class="item-img" src="${p.image || '/logosrevis.png'}" alt="${p.name}" />
+              <div class="item-info">
+                <h4>${p.name}</h4>
+                <p>${p.description ? p.description.substring(0, 80) + (p.description.length > 80 ? '...' : '') : ''}</p>
+                <p><span class="chip">${p.category || 'General'}</span> <span class="preview-price" style="font-size:0.85rem">${currency(p.price)}</span></p>
+              </div>
+              <div class="item-actions">
+                <button class="btn danger" onclick="deleteProduct('${p.id}')" style="font-size:0.8rem; padding:8px 14px;">Borrar</button>
+              </div>
+            </div>
+          `).join("");
+        } catch (err) {
+          list.innerHTML = '<div class="empty">Error al cargar productos.</div>';
+        }
+      }
+
+      window.deleteProduct = async function(id) {
+        if (!confirm("¿Eliminar este producto?")) return;
+        try {
+          await fetchJSON("/api/admin/products/" + id, { method: "DELETE" });
+          loadProducts();
+        } catch (err) {
+          alert(err.message || "No se pudo borrar");
+        }
+      };
+
       async function init() {
         try {
           await loadSettings().catch(() => {});
@@ -832,6 +868,7 @@
         try {
           const resp = await fetch("/admin/login", {
             method: "POST",
+            credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               email: $("#adminEmail").value.trim(),
