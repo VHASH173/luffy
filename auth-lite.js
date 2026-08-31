@@ -224,28 +224,6 @@
     form.addEventListener("submit", isRegisterPage ? handleRegister : handleLogin);
   }
 
-  const manualForm = document.getElementById("manualLoginForm");
-  if (manualForm) {
-    manualForm.addEventListener("submit", async function (ev) {
-      ev.preventDefault();
-      const email = document.getElementById("adminEmail")?.value?.trim() || "";
-      const password = document.getElementById("adminPassword")?.value || "";
-      const msgEl = document.getElementById("manualLoginMessage");
-      if (msgEl) { msgEl.style.display = "block"; msgEl.textContent = "Validando..."; msgEl.style.color = "#cbd5e1"; }
-      try {
-        const data = await postJSON("/admin/login", { email, password });
-        if (data.status !== "success" || !data.token) {
-          throw new Error(data.message || "Credenciales incorrectas");
-        }
-        localStorage.setItem("LUFFY_ADMIN_TOKEN", data.token);
-        if (msgEl) { msgEl.textContent = "Bienvenido " + (data.user?.nombre || "Admin") + ". Redirigiendo..."; msgEl.style.color = "#86efac"; }
-        setTimeout(function () { location.href = "/admin.html"; }, 800);
-      } catch (err) {
-        if (msgEl) { msgEl.textContent = err.message || "Error al iniciar sesión"; msgEl.style.color = "#fca5a5"; }
-      }
-    });
-  }
-
   let tries = 0;
   const waitGoogle = setInterval(() => {
     tries += 1;
