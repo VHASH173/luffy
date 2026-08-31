@@ -2569,3 +2569,20 @@ body {
     width: 100%;
     display: block;
 }
+
+/* Compactar página principal */
+.inicio-module__nl00za__heroSection {
+    min-height: 160px !important;
+    padding: 16px 20px !important;
+}
+.productos-module__DyLbEG__commentsPanel {
+    max-height: 180px;
+    overflow: hidden;
+}
+.inicio-module__nl00za__communitySection {
+    margin-top: 10px !important;
+}
+.inicio-module__nl00za__communityRow {
+    padding: 10px 14px !important;
+    gap: 10px !important;
+}

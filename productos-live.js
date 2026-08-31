@@ -203,24 +203,44 @@
       return;
     }
 
-    grid.innerHTML = state.filtered.map((item) => `
-      <article style="border-radius:26px;border:1px solid rgba(96,165,250,.16);background:linear-gradient(180deg,rgba(7,13,24,.94),rgba(4,8,18,.88));box-shadow:0 18px 42px rgba(0,0,0,.24);overflow:hidden;">
-        <img src="${escapeHtml(item.image || "/logosrevis.png")}" alt="${escapeHtml(item.name || "Producto")}" style="width:100%;height:220px;object-fit:cover;background:#0f172a;">
-        <div style="padding:18px;display:grid;gap:10px;">
-          <span style="display:inline-flex;width:fit-content;padding:6px 10px;border-radius:999px;background:rgba(127,29,29,.18);border:1px solid rgba(250,204,21,.26);color:#fcd34d;font-size:.8rem;font-weight:800;">${escapeHtml(item.category || "General")}</span>
-          <h3 style="margin:0;color:#fff;font-size:1.18rem;">${escapeHtml(item.name || "Sin nombre")}</h3>
-          <p style="margin:0;color:#cbd5e1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;max-height:4.5em;">${escapeHtml(item.description || "Sin descripción")}</p>
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-            <div>
-              ${item.presalePrice
-                ? `<span style="font-size:1.15rem;color:#fff;text-decoration:line-through;opacity:0.5;margin-right:8px;">${currency(item.price)}</span><strong style="font-size:1.15rem;color:#86efac;">${currency(item.presalePrice)}</strong>`
-                : `<strong style="font-size:1.15rem;color:#fff;">${currency(item.price)}</strong>`
-              }
-            </div>
-            <button data-buy="${escapeHtml(item.id)}" type="button" style="border:0;cursor:pointer;padding:12px 18px;border-radius:999px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;font-weight:800;">Comprar</button>
-          </div>
+    const categories = {};
+    state.filtered.forEach((item) => {
+      const cat = item.category || "Otros";
+      if (!categories[cat]) categories[cat] = [];
+      categories[cat].push(item);
+    });
+
+    const catOrder = ["Netflix","Disney+","HBO Max","Amazon Prime","Paramount+","Apple TV+","Crunchyroll","YouTube Premium","Spotify","Apple Music","YouTube Music","Office 365","Canva Pro","ChatGPT Plus","Adobe","Juegos","Xbox Game Pass","PlayStation Plus","Nintendo","Steam","Relojes","Perfumes","Lentes","Billeteras","Cadenas","Pulseras","Cuentas Streaming","Cuentas Gaming","Cuentas Redes","Otros"];
+    const sortedCats = Object.keys(categories).sort((a, b) => {
+      const ia = catOrder.indexOf(a);
+      const ib = catOrder.indexOf(b);
+      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+    });
+
+    grid.innerHTML = sortedCats.map(cat => `
+      <section style="grid-column:1/-1;margin-top:12px;">
+        <h2 style="color:#fcd34d;font-size:1.2rem;margin:0 0 12px;padding-left:4px;">${escapeHtml(cat)}</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;">
+          ${categories[cat].map(item => `
+            <article style="border-radius:22px;border:1px solid rgba(96,165,250,.16);background:linear-gradient(180deg,rgba(7,13,24,.94),rgba(4,8,18,.88));box-shadow:0 14px 32px rgba(0,0,0,.22);overflow:hidden;">
+              <img src="${escapeHtml(item.image || "/logosrevis.png")}" alt="${escapeHtml(item.name || "Producto")}" style="width:100%;height:180px;object-fit:cover;background:#0f172a;">
+              <div style="padding:14px;display:grid;gap:8px;">
+                <h3 style="margin:0;color:#fff;font-size:1.05rem;">${escapeHtml(item.name || "Sin nombre")}</h3>
+                <p style="margin:0;color:#cbd5e1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-height:3em;font-size:.88rem;">${escapeHtml(item.description || "Sin descripción")}</p>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+                  <div>
+                    ${item.presalePrice
+                      ? `<span style="font-size:1rem;color:#fff;text-decoration:line-through;opacity:0.5;margin-right:6px;">${currency(item.price)}</span><strong style="font-size:1rem;color:#86efac;">${currency(item.presalePrice)}</strong>`
+                      : `<strong style="font-size:1rem;color:#fff;">${currency(item.price)}</strong>`
+                    }
+                  </div>
+                  <button data-buy="${escapeHtml(item.id)}" type="button" style="border:0;cursor:pointer;padding:10px 16px;border-radius:999px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;font-weight:800;font-size:.88rem;">Comprar</button>
+                </div>
+              </div>
+            </article>
+          `).join("")}
         </div>
-      </article>
+      </section>
     `).join("");
 
     grid.querySelectorAll("[data-buy]").forEach((button) => {
