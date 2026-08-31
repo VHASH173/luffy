@@ -160,18 +160,23 @@
     const result = document.getElementById("checkoutResult");
     const displayPrice = item.presalePrice || item.price;
     const yapeNumber = "918871372";
-    const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" + encodeURIComponent("YAPE:" + yapeNumber + ":" + displayPrice);
+    const showQr = item.showQr === true;
+    const qrHtml = showQr
+      ? `<img src="/yape-qr.png" alt="QR Yape" style="width:200px;height:200px;border-radius:16px;background:#fff;padding:8px;margin:8px auto;display:block;" />`
+      : "";
+    const instrucciones = showQr
+      ? `<p style="color:#cbd5e1;font-size:.82rem;margin:0 0 12px;">Escanea el QR y paga <strong>S/ ${Number(displayPrice).toFixed(2)}</strong></p>`
+      : `<p style="color:#cbd5e1;font-size:.82rem;margin:0 0 6px;">Yapea a: <strong style="color:#57ff5a;">${yapeNumber}</strong></p>
+         <p style="color:#fcd34d;font-weight:800;font-size:1.1rem;margin:4px 0 12px;">${currency(displayPrice)}</p>`;
 
     title.textContent = item.name || "Comprar producto";
     meta.textContent = currency(displayPrice) + (item.presalePrice ? " (preventa)" : "") + " · " + (item.category || "General");
     methods.innerHTML = "";
     result.innerHTML = `
       <div style="text-align:center;">
-        <p style="color:#93c5fd;font-weight:700;margin:0 0 6px;font-size:.85rem;">Escanea con tu app Yape</p>
-        <img src="${qrUrl}" alt="QR Yape" style="width:200px;height:200px;border-radius:16px;background:#fff;padding:8px;margin:8px auto;display:block;" />
-        <p style="color:#57ff5a;font-family:monospace;font-size:1.1rem;font-weight:700;margin:10px 0 4px;">${yapeNumber}</p>
-        <p style="color:#fcd34d;font-weight:800;font-size:1.2rem;margin:4px 0 10px;">${currency(displayPrice)}</p>
-        <p style="color:#cbd5e1;font-size:.82rem;margin:0 0 12px;">Abre Yape → Escanear → Paga el monto exacto</p>
+        <p style="color:#93c5fd;font-weight:700;margin:0 0 6px;font-size:.85rem;">Pago por Yape</p>
+        ${qrHtml}
+        ${instrucciones}
         <a href="https://wa.me/51${yapeNumber}?text=${encodeURIComponent("Hola, compré " + item.name + " por " + currency(displayPrice) + ". Adjunto comprobante.")}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;text-decoration:none;font-weight:800;font-size:.9rem;">
           Enviar comprobante por WhatsApp
         </a>

@@ -468,6 +468,12 @@
                 <label for="description">Descripción</label>
                 <textarea id="description" required placeholder="Describe el producto..." style="min-height:70px;"></textarea>
               </div>
+              <div class="field full">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                  <input type="checkbox" id="showQr" style="width:18px;height:18px;accent-color:#4f46e5;" />
+                  Mostrar QR de Yape al comprar
+                </label>
+              </div>
               <input type="hidden" id="paymentMethodsInput" value="yape" />
             </div>
             <div style="margin-top:14px;">
@@ -639,6 +645,7 @@
               category: $("#category").value,
               price: $("#price").value,
               presalePrice: $("#presalePrice").value ? Number($("#presalePrice").value) : null,
+              showQr: $("#showQr").checked,
               image: imageUrl,
               description: $("#description").value.trim(),
               paymentMethods: ["yape"],
