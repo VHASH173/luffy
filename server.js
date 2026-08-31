@@ -621,6 +621,7 @@ app.get("/admin.html", (req, res) => {
 
 // Rutas limpias (sin .html)
 // Login normal de usuario => Google OAuth
+app.get("/login", (req, res) => res.redirect("/google.html"));
 app.get("/leaderboard", (req, res) => res.redirect("/productos"));
 app.get("/leaderboard.html", (req, res) => res.redirect("/productos"));
 
