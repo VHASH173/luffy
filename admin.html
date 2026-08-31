@@ -816,11 +816,11 @@ async function fetchJSON(url, options) {
         const err = $("#loginError");
         err.textContent = "Validando...";
         try {
-          const data = await fetchJSON("/secure/login", {
+          const data = await fetchJSON("/admin/login", {
             method: "POST",
             body: JSON.stringify({
-              emailuser: $("#adminEmail").value.trim(),
-              showpassword: $("#adminPass").value,
+              email: $("#adminEmail").value.trim(),
+              password: $("#adminPass").value,
             }),
           });
           if (data.status === "success") {

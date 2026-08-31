@@ -274,11 +274,29 @@ function signToken(user) {
     { expiresIn: "7d" }
   );
 }
+function signAdminToken(user) {
+  return jwt.sign(
+    { id: user.id, email: user.email, nombre: user.nombre, role: "admin" },
+    JWT_SECRET,
+    { expiresIn: "24h" }
+  );
+}
 function getUserFromReq(req) {
   const token = req.cookies?.auth_token;
   if (!token) return null;
   try {
     return jwt.verify(token, JWT_SECRET);
+  } catch {
+    return null;
+  }
+}
+function getAdminFromReq(req) {
+  const token = req.cookies?.admin_token;
+  if (!token) return null;
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.role !== "admin" || !isAdminEmail(decoded.email)) return null;
+    return decoded;
   } catch {
     return null;
   }
@@ -294,10 +312,9 @@ function requireAuth(req, res, next) {
   next();
 }
 function requireAdmin(req, res, next) {
-  const user = getUserFromReq(req);
-  if (!user) return res.status(401).json({ status: "error", message: "Sesión inválida" });
-  if (!isAdminEmail(user.email)) return res.status(403).json({ status: "error", message: "No eres admin." });
-  req.user = user;
+  const admin = getAdminFromReq(req);
+  if (!admin) return res.status(401).json({ status: "error", message: "Sesión de admin inválida." });
+  req.user = admin;
   next();
 }
 
@@ -345,6 +362,52 @@ app.post("/secure/login", async (req, res) => {
     console.error(err);
     res.status(500).json({ status: "error", message: "Error interno" });
   }
+});
+
+// POST /admin/login — login SEPARADO solo para administradores
+app.post("/admin/login", async (req, res) => {
+  try {
+    const email = (req.body.email || "").toString().trim().toLowerCase();
+    const password = (req.body.password || "").toString();
+
+    if (!email || !password) {
+      return res.status(400).json({ status: "error", message: "Faltan datos" });
+    }
+    if (!isAdminEmail(email)) {
+      return res.status(403).json({ status: "error", message: "No tienes acceso de administrador." });
+    }
+
+    const user = await findUserByEmailStore(email);
+    if (!user) {
+      return res.status(401).json({ status: "error", message: "Credenciales incorrectas." });
+    }
+    const ok = await bcrypt.compare(password, user.password);
+    if (!ok) {
+      return res.status(401).json({ status: "error", message: "Credenciales incorrectas." });
+    }
+
+    const token = signAdminToken(user);
+    res.cookie("admin_token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: !!process.env.RENDER_EXTERNAL_URL,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    return res.json({
+      status: "success",
+      user: { id: user.id, email: user.email, nombre: user.nombre },
+    });
+  } catch (err) {
+    console.error("admin/login error:", err);
+    res.status(500).json({ status: "error", message: "Error interno" });
+  }
+});
+
+// POST /admin/logout
+app.post("/admin/logout", (req, res) => {
+  res.clearCookie("admin_token");
+  res.json({ status: "success" });
 });
 
 app.post("/secure/register", async (req, res) => {
@@ -443,6 +506,7 @@ app.post("/secure/verify-code", async (req, res) => {
 
 app.post("/secure/logout", (req, res) => {
   res.clearCookie("auth_token");
+  res.clearCookie("admin_token");
   res.json({ status: "ok" });
 });
 
@@ -521,11 +585,12 @@ app.get("/api/me", (req, res) => {
 });
 app.get("/api/store/config", (req, res) => {
   const user = getUserFromReq(req);
+  const admin = getAdminFromReq(req);
   const s = storeSettings;
   res.json({
     status: "success",
     authed: !!user,
-    isAdmin: !!user && isAdminEmail(user.email),
+    isAdmin: !!admin,
     whatsappNumber: s.whatsappNumber,
     paymentMethods: buildPaymentMethodsList(s),
   });
