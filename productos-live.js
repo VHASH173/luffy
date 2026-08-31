@@ -160,7 +160,7 @@
     const result = document.getElementById("checkoutResult");
     const displayPrice = item.presalePrice || item.price;
     const yapeNumber = "918871372";
-    const showQr = item.showQr === true;
+    const showQr = item.showQr !== false;
     const qrHtml = showQr
       ? `<img src="/yape-qr.png" alt="QR Yape" style="width:200px;height:200px;border-radius:16px;background:#fff;padding:8px;margin:8px auto;display:block;" />`
       : "";
