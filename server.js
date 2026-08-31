@@ -706,7 +706,7 @@ app.post("/api/orders", requireAuth, async (req, res) => {
 });
 
 // Rutas de administración — protegidas con token secreto en URL
-const ADMIN_ACCESS_TOKEN = process.env.ADMIN_ACCESS_TOKEN || "luffy-admin-2026";
+const ADMIN_ACCESS_TOKEN = process.env.ADMIN_ACCESS_TOKEN || "modogalacticosupergey";
 
 app.get("/admin", (req, res) => {
   const k = (req.query.k || "").toString();
