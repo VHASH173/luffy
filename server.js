@@ -377,13 +377,19 @@ app.post("/admin/login", async (req, res) => {
       return res.status(403).json({ status: "error", message: "No tienes acceso de administrador." });
     }
 
-    const user = await findUserByEmailStore(email);
+    let user = findUserByEmail(email);
     if (!user) {
-      return res.status(401).json({ status: "error", message: "Credenciales incorrectas." });
+      try {
+        const snap = await firestoreDb.collection("users").where("email", "==", email).limit(1).get();
+        if (!snap.empty) user = { id: snap.docs[0].id, ...snap.docs[0].data() };
+      } catch (_) {}
+    }
+    if (!user || !user.password) {
+      return res.status(401).json({ status: "error", message: "Credenciales incorrectas. Regístrate primero en la web." });
     }
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) {
-      return res.status(401).json({ status: "error", message: "Credenciales incorrectas." });
+      return res.status(401).json({ status: "error", message: "Contraseña incorrecta." });
     }
 
     const token = signAdminToken(user);
