@@ -406,6 +406,10 @@
                 <input id="price" type="number" min="0" step="0.01" required placeholder="25.00" />
               </div>
               <div class="field">
+                <label for="presalePrice">Preventa (S/) <span style="color:#94a3b8; font-weight:400;">opcional</span></label>
+                <input id="presalePrice" type="number" min="0" step="0.01" placeholder="18.00" />
+              </div>
+              <div class="field">
                 <label for="category">Categoría</label>
                 <select id="category" required>
                   <option value="">Elegir...</option>
@@ -543,7 +547,7 @@
               <div class="item-info">
                 <h4>${p.name}</h4>
                 <p style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${p.description || ''}</p>
-                <p><span class="chip">${p.category || 'General'}</span> <span class="preview-price" style="font-size:0.85rem">S/ ${Number(p.price || 0).toFixed(2)}</span></p>
+                <p><span class="chip">${p.category || 'General'}</span> ${p.presalePrice ? `<span style="text-decoration:line-through;opacity:0.5;margin-right:4px;">S/ ${Number(p.price || 0).toFixed(2)}</span><span style="color:#86efac;font-weight:800;">S/ ${Number(p.presalePrice).toFixed(2)}</span>` : `<span class="preview-price" style="font-size:0.85rem">S/ ${Number(p.price || 0).toFixed(2)}</span>`}</p>
               </div>
               <div class="item-actions">
                 <button class="btn danger" onclick="deleteProduct('${p.id}')" style="font-size:0.8rem; padding:8px 14px;">Borrar</button>
@@ -604,6 +608,7 @@
               name: $("#name").value.trim(),
               category: $("#category").value,
               price: $("#price").value,
+              presalePrice: $("#presalePrice").value ? Number($("#presalePrice").value) : null,
               image: imageUrl,
               description: $("#description").value.trim(),
               paymentMethods: ["yape"],

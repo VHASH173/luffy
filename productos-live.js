@@ -129,7 +129,7 @@
         body: JSON.stringify({
           productId: state.current.id,
           productName: state.current.name,
-          amount: state.current.price,
+          amount: state.current.presalePrice || state.current.price,
           paymentMethod: methodId,
           note,
         }),
@@ -144,7 +144,7 @@
         <div style="padding:16px;border-radius:18px;border:1px solid rgba(96,165,250,.18);background:rgba(15,23,42,.6);">
           <strong style="display:block;color:#86efac;margin-bottom:8px;">Pedido registrado: ${escapeHtml(data.order.id)}</strong>
           <p style="margin:0 0 8px;color:#e5e7eb;">Método: <strong>${escapeHtml(method ? method.label : methodId)}</strong></p>
-          <p style="margin:0 0 8px;color:#e5e7eb;">Monto: <strong>${currency(state.current.price)}</strong></p>
+          <p style="margin:0 0 8px;color:#e5e7eb;">Monto: <strong>${currency(state.current.presalePrice || state.current.price)}</strong></p>
           <p style="margin:0;color:#cbd5e1;">Dato de pago: <strong>${escapeHtml(target)}</strong></p>
           <p style="margin:10px 0 0;color:#cbd5e1;">Haz el pago y adjunta la captura manualmente por WhatsApp.</p>
           ${waButton}
@@ -173,7 +173,8 @@
       : ["yape", "plin"];
 
     title.textContent = item.name || "Comprar producto";
-    meta.textContent = `${currency(item.price)} · ${item.category || "General"}`;
+    const displayPrice = item.presalePrice || item.price;
+    meta.textContent = `${currency(displayPrice)}${item.presalePrice ? ' (preventa)' : ''} · ${item.category || "General"}`;
     result.innerHTML = "";
     methods.innerHTML = itemMethods.map((methodId) => {
       const info = (state.config.paymentMethods || []).find((entry) => entry.id === methodId);
@@ -210,7 +211,12 @@
           <h3 style="margin:0;color:#fff;font-size:1.18rem;">${escapeHtml(item.name || "Sin nombre")}</h3>
           <p style="margin:0;color:#cbd5e1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;max-height:4.5em;">${escapeHtml(item.description || "Sin descripción")}</p>
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-            <strong style="font-size:1.15rem;color:#fff;">${currency(item.price)}</strong>
+            <div>
+              ${item.presalePrice
+                ? `<span style="font-size:1.15rem;color:#fff;text-decoration:line-through;opacity:0.5;margin-right:8px;">${currency(item.price)}</span><strong style="font-size:1.15rem;color:#86efac;">${currency(item.presalePrice)}</strong>`
+                : `<strong style="font-size:1.15rem;color:#fff;">${currency(item.price)}</strong>`
+              }
+            </div>
             <button data-buy="${escapeHtml(item.id)}" type="button" style="border:0;cursor:pointer;padding:12px 18px;border-radius:999px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;font-weight:800;">Comprar</button>
           </div>
         </div>

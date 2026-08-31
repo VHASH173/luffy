@@ -178,6 +178,7 @@ async function saveProductStore(payload, editor) {
     name: String(payload.name || "").trim(),
     description: String(payload.description || "").trim(),
     price: Number(payload.price || 0),
+    presalePrice: payload.presalePrice ? Number(payload.presalePrice) : null,
     image: String(payload.image || "").trim(),
     category: String(payload.category || "General").trim(),
     paymentMethods: Array.isArray(payload.paymentMethods) && payload.paymentMethods.length ? payload.paymentMethods : ["yape", "plin"],
