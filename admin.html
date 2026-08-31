@@ -483,33 +483,29 @@
              </form>
            </section>
 
-           <!-- Configuración de QR de pagos -->
+           <!-- Configuración de pagos -->
            <section class="card">
-             <h2 style="margin-bottom:14px">Configuración de QR de pagos</h2>
-             <p class="muted" style="margin-bottom:16px;">Sube tus propios códigos QR para cada método. Se usarán en los modales de pago.</p>
+             <h2 style="margin-bottom:14px">Configuración de pagos</h2>
+             <p class="muted" style="margin-bottom:16px;">Ingresa los números de cada método. El QR se genera automáticamente.</p>
              <form id="qrConfigForm">
                <div class="form-grid">
                  <div class="field">
-                   <label>Yape - Subir QR</label>
-                   <input type="file" id="qrYape" accept="image/*" />
-                   <img id="qrYapePreview" src="" alt="QR Yape" style="max-width:120px; margin-top:8px; display:none; border-radius:8px; border:1px solid #334155;" />
-                   <p class="muted" style="font-size:0.75rem; margin-top:4px;">URL actual: <span id="qrYapeUrl">-</span></p>
+                   <label>Yape - Número</label>
+                   <input type="tel" id="yapeNumberInput" placeholder="918871372" />
+                   <img id="qrYapePreview" src="" alt="QR Yape" style="max-width:140px; margin-top:8px; display:none; border-radius:8px; border:1px solid #334155;" />
                  </div>
                  <div class="field">
-                   <label>Plin - Subir QR</label>
-                   <input type="file" id="qrPlin" accept="image/*" />
-                   <img id="qrPlinPreview" src="" alt="QR Plin" style="max-width:120px; margin-top:8px; display:none; border-radius:8px; border:1px solid #334155;" />
-                   <p class="muted" style="font-size:0.75rem; margin-top:4px;">URL actual: <span id="qrPlinUrl">-</span></p>
+                   <label>Plin - Número</label>
+                   <input type="tel" id="plinNumberInput" placeholder="918871372" />
+                   <img id="qrPlinPreview" src="" alt="QR Plin" style="max-width:140px; margin-top:8px; display:none; border-radius:8px; border:1px solid #334155;" />
                  </div>
-                 <div class="field">
-                   <label>Transferencia - Subir QR</label>
-                   <input type="file" id="qrTransferencia" accept="image/*" />
-                   <img id="qrTransferenciaPreview" src="" alt="QR Transferencia" style="max-width:120px; margin-top:8px; display:none; border-radius:8px; border:1px solid #334155;" />
-                   <p class="muted" style="font-size:0.75rem; margin-top:4px;">URL actual: <span id="qrTransferenciaUrl">-</span></p>
+                 <div class="field full">
+                   <label>Transferencia Bancaria - Información</label>
+                   <textarea id="transferInfoInput" placeholder="BCP - 193-12345678-0-12&#10;CCI: 002-193-001234567890-12&#10;Titular: LUFFY LUXE STORE"></textarea>
                  </div>
                </div>
                <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-                 <button class="btn" type="submit">Guardar QR</button>
+                 <button class="btn" type="submit">Guardar Pagos</button>
                </div>
                <p class="status" id="qrStatus"></p>
              </form>
@@ -759,36 +755,42 @@
         e.preventDefault();
         try {
           const payload = {};
-          const qrFields = { qrYape: "yapeQR", qrPlin: "plinQR", qrTransferencia: "transferQR" };
-          for (const [inputId, key] of Object.entries(qrFields)) {
-            const fileInput = document.getElementById(inputId);
-            if (fileInput && fileInput.files[0]) {
-              const url = await uploadImage(fileInput.files[0]);
-              payload[key] = url;
-            }
-          }
-          if (Object.keys(payload).length === 0) {
-            setQRStatus("Selecciona al menos una imagen QR", false);
+          const yapeNum = $("#yapeNumberInput")?.value?.trim().replace(/\D/g, "");
+          const plinNum = $("#plinNumberInput")?.value?.trim().replace(/\D/g, "");
+          const transferTxt = $("#transferInfoInput")?.value?.trim() || "";
+          if (yapeNum) payload.yapeNumber = yapeNum;
+          if (plinNum) payload.plinNumber = plinNum;
+          if (transferTxt) payload.transferInfo = transferTxt;
+          if (!Object.keys(payload).length) {
+            setQRStatus("Ingresa al menos un número o información", false);
             return;
           }
           await fetchJSON("/api/admin/settings", { method: "PUT", body: JSON.stringify(payload) });
           storeSettings = { ...storeSettings, ...payload };
           renderPaymentData();
           updateQRPreviews();
-          setQRStatus("QR guardado ✓", true);
+          setQRStatus("Pagos guardados ✓", true);
         } catch (err) {
-          setQRStatus(err.message || "Error al guardar QR", false);
+          setQRStatus(err.message || "Error al guardar", false);
         }
       });
 
-      async function updateQRPreviews() {
+      function updateQRPreviews() {
         const s = storeSettings;
-        if ($("#qrYapeUrl")) $("#qrYapeUrl").textContent = s.yapeQR || "-";
-        if ($("#qrPlinUrl")) $("#qrPlinUrl").textContent = s.plinQR || "-";
-        if ($("#qrTransferenciaUrl")) $("#qrTransferenciaUrl").textContent = s.transferQR || "-";
-        if (s.yapeQR) { const img = $("#qrYapePreview"); img.src = s.yapeQR; img.style.display = "block"; }
-        if (s.plinQR) { const img = $("#qrPlinPreview"); img.src = s.plinQR; img.style.display = "block"; }
-        if (s.transferQR) { const img = $("#qrTransferenciaPreview"); img.src = s.transferQR; img.style.display = "block"; }
+        const yapeImg = $("#qrYapePreview");
+        const plinImg = $("#qrPlinPreview");
+        if (yapeImg) {
+          if (s.yapeNumber) {
+            yapeImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=YAPE%3A%20" + s.yapeNumber;
+            yapeImg.style.display = "block";
+          } else { yapeImg.style.display = "none"; }
+        }
+        if (plinImg) {
+          if (s.plinNumber) {
+            plinImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PLIN%3A%20" + s.plinNumber;
+            plinImg.style.display = "block";
+          } else { plinImg.style.display = "none"; }
+        }
       }
 
       async function loadProducts() {
@@ -835,6 +837,15 @@
           updateQRPreviews();
           if ($("#adminPhone") && storeSettings.whatsappNumber) {
             $("#adminPhone").value = "+" + storeSettings.whatsappNumber;
+          }
+          if ($("#yapeNumberInput") && storeSettings.yapeNumber) {
+            $("#yapeNumberInput").value = storeSettings.yapeNumber;
+          }
+          if ($("#plinNumberInput") && storeSettings.plinNumber) {
+            $("#plinNumberInput").value = storeSettings.plinNumber;
+          }
+          if ($("#transferInfoInput") && storeSettings.transferInfo) {
+            $("#transferInfoInput").value = storeSettings.transferInfo;
           }
         } catch (_) {}
 
